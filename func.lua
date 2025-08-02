@@ -90,3 +90,18 @@ function save()
     end
     writeToFile(name,data)
 end
+
+function runCartFromEditor(k)
+    if love.keyboard.isDown("lctrl") and k=="r" then
+        if cartLoaded then
+            for y=0,127 do
+                for x=0,127 do
+                    loadSheet[x+(y*128)+1]=api.sget(x,y)
+                end
+            end
+            gs.switch(runCart,mem.map)
+        else
+            gs.switch(menuProg)
+        end
+    end
+end

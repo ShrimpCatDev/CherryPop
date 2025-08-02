@@ -12,7 +12,15 @@ cart=[[
 
 ]]
 
+console = require "lib/console"
+
+function colr(c)
+    love.graphics.setColor(palCol(c))
+end
+
 function love.load()
+    buttons=require("buttons")
+    bar=require("editors/bar")
     loadSheet={}
     lg.setLineStyle("rough")
     rand=love.math.random
@@ -22,7 +30,12 @@ function love.load()
     gs.registerEvents()
     runCart=require("runcart")
     menuProg=require("menu")
-    editor={sprite=require("editors/sprite")}
+
+    editor={}
+    editor.sprite=require("editors/sprite")
+    editor.code=require("editors/code")
+    editor.wip=require("editors/wip")
+
     love.mouse.setVisible(false)
     loadSheet={}
     cartLoaded=false
@@ -41,7 +54,7 @@ local rand=love.math.random
 --sprite memory: 0x3032 to 0x7032
 
 function love.update()
-    
+    require("lovebird").update()
 end
 
 num=false
@@ -56,28 +69,4 @@ end
 
 function love.resize(w, h)
     return push:resize(w, h)
-end
-
-function love.keypressed(k)
-    --[[if k=="right" then
-        num=true
-    end
-    if k=="up" then
-        api.palset(ind,255,255,255)
-        ind=ind+1
-        
-    end
-    if k=="down" then
-        for j=0,95 do
-            for i=0,127 do
-                api.pset(i,j,i%16)
-            end
-        end
-    end
-    if k=="left" then
-        num=false
-        for i=0,9 do
-            api.rectfill(rand(0,127),rand(0,95),rand(0,127),rand(0,95),rand(1,15))
-        end
-    end]]
 end
