@@ -122,6 +122,7 @@ function api.cls(c)
             api.pset(x,y,cc)
         end
     end
+    print("screen cleared")
 end
 
 local function Color(hex, value)
@@ -156,8 +157,9 @@ function api.printc(letter,x,y,color)
 end
 
 function api.print(text,x,y,c)
-    for i=0,string.len(text)-1 do
-        api.printc(getChar(text,i+1),i*font.w+x,y,c)
+    local text2=tostring(text)
+    for i=0,string.len(text2)-1 do
+        api.printc(getChar(text2,i+1),i*font.w+x,y,c)
     end
 end
 

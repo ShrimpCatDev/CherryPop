@@ -63,7 +63,7 @@ function sprite:update()
             end
             --spritesheet
             if col(mouse.x,mouse.y,0,72,1,1,128,8*3) then
-                local x,y=math.floor((mouse.x)/8),math.floor(((mouse.y-71+sheetOs)/8))
+                local x,y=math.floor((mouse.x)/8),math.floor(((mouse.y-73+sheetOs)/8))
                 sel.x,sel.y=x,y
             end
         end
@@ -84,12 +84,6 @@ function deco(x,y,w,h)
     lg.line(x+1,y,x+1,y+h)
     lg.line(x+1,y+h,x+w,y+h)
 end
-
-local pnt=love.graphics.points
-function lg.point(x,y)
-    pnt(math.floor(x)+0.5,math.floor(y)+0.5)
-end
-lg.points=lg.point
 
 function sprite:draw()
 

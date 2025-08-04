@@ -128,7 +128,7 @@ function menu:enter()
     items=getFileList()
     love.filesystem.write("DONTREADME.txt", "this is a temporary file just ignore this")
     
-    initFont("assets/font.png","abcdefghijklmnopqrstuvwxyz !CS0123456789.:(){}",7,8)
+    initFont("assets/font.png",[===[abcdefghijklmnopqrstuvwxyz !CS0123456789.:(){}-+/*,="'_]===],7,8)
     input2=baton.new {
         controls = {
             left = {'key:left', 'key:a', 'axis:leftx-', 'button:dpleft'},
@@ -190,8 +190,11 @@ function menu:pressed(key)
         if ind>#items then ind=1 end
     end
     if key=="return" or key=="z" then
+        
         load.readFile(items[ind])
+        print(memCode)
         name=items[ind]
+        
         gs.switch(runCart)
     end
 end

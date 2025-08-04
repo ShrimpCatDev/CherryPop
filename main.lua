@@ -1,6 +1,6 @@
 love.graphics.setDefaultFilter("nearest","nearest")
 push=require("lib/push")
-push:setupScreen(128,96,128*5,96*5,{resizable=true})
+push:setupScreen(128,96,128*5,96*5,{resizable=true,pixelperfect=true})
 
 require("func")
 local api=require("api")
@@ -18,11 +18,28 @@ function colr(c)
     love.graphics.setColor(palCol(c))
 end
 
+function love.textinput(txt)
+    --gs.textinput(txt)
+end
+
+
 function love.load()
+    love.window.setTitle("CherryPop")
+    love.window.setIcon(love.image.newImageData("assets/windowIcon.png"))
+    codeLines={}
+    love.keyboard.setKeyRepeat(true)
+    memCode=[[]]
     buttons=require("buttons")
     bar=require("editors/bar")
     loadSheet={}
     lg.setLineStyle("rough")
+    
+    local pnt=love.graphics.points
+    function lg.point(x,y)
+        pnt(math.floor(x)+0.5,math.floor(y)+0.5)
+    end
+    lg.points=lg.point
+
     rand=love.math.random
     mem=require("memory")
     mem.init()
@@ -35,10 +52,13 @@ function love.load()
     editor.sprite=require("editors/sprite")
     editor.code=require("editors/code")
     editor.wip=require("editors/wip")
+    editor.error=require("editors/error")
 
     love.mouse.setVisible(false)
     loadSheet={}
     cartLoaded=false
+    codeInit=false
+    codeLines={}
     gs.switch(menuProg)
 end
 

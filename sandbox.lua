@@ -33,13 +33,25 @@ sb.box={
     table=table
 }
 
+--[[function sb.initCart(code)
+    func, err = loadstring(code)
+    setfenv(func,sb.box)
+    
+    func()
+    if sb.box._load then sb.box._load() end
+    ran=true
+end]]
+
 function sb.initCart(code)
+    sb.box._load=nil
+    sb.box._tick=nil
     func, err = loadstring(code)
     setfenv(func,sb.box)
     func()
     if sb.box._load then sb.box._load() end
     ran=true
 end
+
 
 function sb.tickCart()
     if not paused then

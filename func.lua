@@ -51,7 +51,7 @@ function initFont(image,text,w,h)
 end
 
 function drawChar(letter,x,y)
-    local indx=string.find(font.text,letter)
+    local indx = string.find(font.text, letter, 1, true)
     if indx then
         local i=1
         for y1=0,font.h-1 do
@@ -82,6 +82,10 @@ end
 local hex="0123456789abcdef"
 
 function save()
+    cart=[[]]
+    for k,v in ipairs(codeLines) do
+        cart=cart..v.."\n"
+    end
     local data = "#CODE\n"
     data = data .. cart .. "\n"
     data = data .. "#SPRITE\n"
@@ -93,15 +97,20 @@ end
 
 function runCartFromEditor(k)
     if love.keyboard.isDown("lctrl") and k=="r" then
-        if cartLoaded then
+        --if cartLoaded then
+            cart=[[]]
+            for k,v in ipairs(codeLines) do
+                cart=cart..v.."\n"
+            end
             for y=0,127 do
                 for x=0,127 do
                     loadSheet[x+(y*128)+1]=api.sget(x,y)
                 end
             end
+            api.cls(0)
             gs.switch(runCart,mem.map)
-        else
-            gs.switch(menuProg)
-        end
+        --else
+        --    gs.switch(menuProg)
+        --end
     end
 end
