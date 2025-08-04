@@ -46,10 +46,17 @@ function sb.initCart(code)
     sb.box._load=nil
     sb.box._tick=nil
     func, err = loadstring(code)
+    if not func then
+        gs.switch(editor.error,err)
+        return
+    end
+
     setfenv(func,sb.box)
+    
     func()
     if sb.box._load then sb.box._load() end
     ran=true
+    paused=false
 end
 
 

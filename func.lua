@@ -113,4 +113,7 @@ function runCartFromEditor(k)
         --    gs.switch(menuProg)
         --end
     end
+    if k=="escape" then
+        gs.switch(menuProg)
+    end
 end

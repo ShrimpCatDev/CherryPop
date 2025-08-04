@@ -231,9 +231,6 @@ function sprite:keypressed(k)
     if love.keyboard.isDown("lctrl") and k=="s" then
         save()
     end
-    if love.keyboard.isDown("f1") then
-        gs.switch(menuProg)
-    end
 end
 
 return sprite

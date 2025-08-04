@@ -60,13 +60,13 @@ function codeEdit:draw()
         ofs=0
 
         colr(6)
-        lg.rectangle("fill",(selection.x*7)+(scroll.x*7)+1,(selection.y*8)+9+(scroll.y*8),7,8)
+        lg.rectangle("fill",(selection.x*font.w)+(scroll.x*font.w)+1,(selection.y*font.h)+(scroll.y*font.h)+9,font.w,font.h)
 
         local color=13
 
         for i,v in ipairs(codeLines) do
             colr(color)
-            drawFont(v,(scroll.x*7)+1,(i*8)+(scroll.y*8)+1)
+            drawFont(v,(scroll.x*font.w)+1,(i*font.h)+(scroll.y*font.h)+3)
             --drawChar(string.sub(cart,i,i),(ii*7)+1,9+(lineBreak*8)+(scroll.y*8))
         end
 
@@ -77,7 +77,7 @@ function codeEdit:draw()
         end
         
     push:finish()
-    --lg.print("length: "..#codeLines,0,0)
+    --lg.print(scroll.x,0,0)
     --lg.print("selection X: "..selection.x.." Y:"..selection.y,0,12)
 end
 
@@ -85,9 +85,9 @@ function codeEdit:mousepressed(x, y, b)
     if b == 1 then
         if mouse.y < 8 then
             bar.press(b)
-        else
-            local smx = math.floor(mouse.x / 7)
-            local smy = math.floor(mouse.y / 8)
+        elseif mouse.x>=1 then
+            local smx = math.floor((mouse.x-1) / font.w)
+            local smy = math.floor((mouse.y-(font.h/2)) / font.h)
 
             local lineIndex = smy - 1 - scroll.y
             lineIndex = math.max(0, math.min(#codeLines - 1, lineIndex)) -- clamp to valid range
@@ -180,22 +180,25 @@ function codeEdit:keypressed(k)
         end
         
     end
+    local scrollStartY=math.floor(96/font.h)-3--13
+    local scrollStartX=math.floor(128/font.w)-2--23
     --down
-    if scroll.y>-(selection.y-10) then
-        scroll.y=-(selection.y-10)
+    if scroll.y>-(selection.y-scrollStartY) then
+        scroll.y=-(selection.y-scrollStartY)
     end
     --up
     if scroll.y<-selection.y then
         scroll.y=-(selection.y)
     end
-    --right
-    if scroll.x<selection.x-16 then
-        scroll.x=-(selection.x-16)
-    end
     --left
     if scroll.x<-selection.x then
         scroll.x=-(selection.x)
+    --end
+    --right
+    elseif scroll.x<selection.x-scrollStartX then
+        scroll.x=-(selection.x-scrollStartX)
     end
+    
     scroll.x=math.min(scroll.x,0)
 end
 
