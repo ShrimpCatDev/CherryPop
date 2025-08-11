@@ -6,19 +6,42 @@ function codeEdit:init()
 
 end
 
+function mysplit(inputstr, sep)
+    if sep == nil then
+      sep = "%s"
+    end
+    local t = {}
+    for str in string.gmatch(inputstr, "([^"..sep.."]*)") do
+      table.insert(t, str)
+    end
+    return t
+end
+
 function codeEdit:enter()
+    print("CODE:")
+    print(cart)
     scroll={x=0,y=0}
     mouse = {x=0, y=0, img=lg.newImage("assets/mouse.png")}
     bar.init()
     --if codeInit then
-        codeLines={}
+        codeLines={}--mysplit(cart, "\n")
+        --[[print("TABLE:")
+        for k,v in ipairs(codeLines) do
+            print(v)
+        end]]
+
         local ind=1
+        local newLine=0
         while ind <= string.len(cart) do
-            table.insert(codeLines,[====[]====])
+            local curr=string.sub(cart,ind,ind)
+
+            newLine=newLine+1
+            table.insert(codeLines,"")
             while string.sub(cart,ind,ind)~="\n" do
                 codeLines[#codeLines]=codeLines[#codeLines]..string.sub(cart,ind,ind)
                 ind=ind+1
             end
+
             ind=ind+1
         end
         if not codeLines[1] then
@@ -115,22 +138,30 @@ local function removeCharAt(str, index)
 end
 
 function codeEdit:keypressed(k)
-    runCartFromEditor(k)
 
-    if love.keyboard.isDown("lctrl") and k=="s" then
-        save()
-    end
+    bar.key(k)
 
-    if k=="backspace" and selection.x>=0 then
-        if string.len(codeLines[selection.y+1])==0 and #codeLines~=1 then
-            table.remove(codeLines,selection.y+1)
-            if selection.y>0 then selection.y=selection.y-1 end
-            selection.x=#codeLines[selection.y+1]
-        elseif selection.x>0 then
-            codeLines[selection.y+1]=removeCharAt(codeLines[selection.y+1],selection.x)
-            selection.x=selection.x-1
+    if k=="backspace" then
+        if selection.x>=0 then
+            if string.len(codeLines[selection.y+1])==0 and #codeLines~=1 then
+                table.remove(codeLines,selection.y+1)
+                if selection.y>0 then selection.y=selection.y-1 end
+                selection.x=#codeLines[selection.y+1]
+            elseif selection.x>0 then
+                codeLines[selection.y+1]=removeCharAt(codeLines[selection.y+1],selection.x)
+                selection.x=selection.x-1
+            end
         end
-        
+        if selection.y>0 and selection.x==0 then
+            local prev=#codeLines[selection.y]
+            codeLines[selection.y]=codeLines[selection.y]..codeLines[selection.y+1]        
+
+            table.remove(codeLines,selection.y+1)
+
+            selection.x=prev
+            selection.y=selection.y-1
+            
+        end 
     end
     if k=="return" then
         local text=string.sub(codeLines[selection.y+1],selection.x+1,#codeLines[selection.y+1])

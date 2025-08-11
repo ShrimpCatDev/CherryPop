@@ -95,23 +95,23 @@ function save()
     writeToFile(name,data)
 end
 
+function runCartCode()
+    cart=[[]]
+    for k,v in ipairs(codeLines) do
+        cart=cart..v.."\n"
+    end
+    for y=0,127 do
+        for x=0,127 do
+            loadSheet[x+(y*128)+1]=api.sget(x,y)
+        end
+    end
+    api.cls(0)
+    gs.switch(runCart,mem.map)
+end
+
 function runCartFromEditor(k)
     if love.keyboard.isDown("lctrl") and k=="r" then
-        --if cartLoaded then
-            cart=[[]]
-            for k,v in ipairs(codeLines) do
-                cart=cart..v.."\n"
-            end
-            for y=0,127 do
-                for x=0,127 do
-                    loadSheet[x+(y*128)+1]=api.sget(x,y)
-                end
-            end
-            api.cls(0)
-            gs.switch(runCart,mem.map)
-        --else
-        --    gs.switch(menuProg)
-        --end
+        runCartCode()
     end
     if k=="escape" then
         gs.switch(menuProg)

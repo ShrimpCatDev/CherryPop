@@ -12,7 +12,7 @@ function wip:enter()
 end
 
 function wip:update()
-    require("lovebird").update()
+    --require("lovebird").update()
     local x,y = love.mouse.getPosition()
     if x and y then
         local xx,yy = push:toGame(x,y)
@@ -53,11 +53,7 @@ function wip:mousepressed(x,y,b)
 end
 
 function wip:keypressed(k)
-
-    runCartFromEditor(k)
-    if love.keyboard.isDown("lctrl") and k=="s" then
-        save()
-    end
+    bar.key(k)
 end
 
 return wip

@@ -20,44 +20,32 @@ end
     cart=contents
 end]]
 
+local keyWordSprite="#SPRITE"
+local keyWordCode="#CODE"
+
 function load.readFile(path)
     local contents = love.filesystem.read(path..".chp")
-    sections = {}
-    local current = ""
-    local currentSection = ""
-    
-    -- Parse file into sections
-    for line in contents:gmatch("[^\r\n]+") do
-        if line:match("^#%w+") then
-            -- Found section marker
-            if currentSection ~= "" then
-                sections[currentSection] = current
-                current = ""
-            end
-            currentSection = line:match("^#(%w+)")
-        else
-            current = current .. line .. "\n"
-        end
+    local codeLoc=string.find(contents,keyWordCode)
+    local  spriteLoc=string.find(contents,keyWordSprite)
+    if codeLoc then 
+        cart=string.sub(contents,codeLoc+string.len(keyWordCode)+1,spriteLoc-1)
+    else
+        cart=""
     end
-    -- Add final section
-    if currentSection ~= "" then
-        sections[currentSection] = current
-    end
-    
-    -- Load code section
-    cart = sections.CODE or ""
-    
-    -- Load sprite data if present
-    if sections.SPRITE then
-        loadSheet={}
-        for i=1,string.len(sections.SPRITE) do
-            local char="0x"..string.sub(sections.SPRITE,i,i)
+
+    local sprString=string.sub(contents,spriteLoc+string.len(keyWordSprite)+1,string.len(contents))
+    print(sprString)
+    if spriteLoc and string.len(sprString)>16383 then
+        for i=1,string.len(sprString) do
+            local char="0x"..string.sub(sprString,i,i)
             local charNum=tonumber(char)
             table.insert(loadSheet,charNum)
         end
+    else
+        for i=1,16384 do
+            table.insert(loadSheet,0)
+        end
     end
-    
-    -- Add similar loading for MAP and SFX sections
 end
 
 function load.readCode(path)
@@ -68,13 +56,13 @@ function load.readCode(path)
     
     -- Parse file into sections
     for line in contents:gmatch("[^\r\n]+") do
-        if line:match("^#%w+") then
+        if line:match("^#%w*") then
             -- Found section marker
             if currentSection ~= "" then
                 sections[currentSection] = current
                 current = ""
             end
-            currentSection = line:match("^#(%w+)")
+            currentSection = line:match("^#(%w*)")
         else
             current = current .. line .. "\n"
         end
@@ -131,6 +119,7 @@ local function refreshFiles()
 end
 
 function menu:enter()
+
     makingFile=false
     fileName=""
     local isFile = love.filesystem.getInfo("TextDemo.chp")
@@ -139,7 +128,7 @@ function menu:enter()
     end
     refreshFiles()
     
-    initFont("assets/font.png",[===[abcdefghijklmnopqrstuvwxyz !CF0123456789.:(){}-+/*,="'_[]RBSH?]===],5,6)
+    
     input2=baton.new {
         controls = {
             left = {'key:left', 'key:a', 'axis:leftx-', 'button:dpleft'},
@@ -172,8 +161,10 @@ function menu:update()
             if ind==#items then
                 makingFile=true
             else
+                loadSheet={}
                 load.readFile(items[ind])
                 name=items[ind]
+                spriteUndo={}
                 gs.switch(runCart)
             end
         end
@@ -196,7 +187,7 @@ function menu:draw()
         for k=1,#items do
             if k==ind then
                 colr(13)
-                drawFont("*"..items[k],1,(k*font.h)-font.h+9)
+                drawFont("A"..items[k],1,(k*font.h)-font.h+9)
             else
                 colr(3)
                 drawFont(items[k],1,(k*font.h)-font.h+9)
@@ -238,8 +229,9 @@ function menu:keypressed(key)
             gs.switch(editor.code)
         end
         if key=="f" then
-            love.system.setClipboardText(love.filesystem.getSaveDirectory( ))
-            message="copied data directory!"
+            --love.system.setClipboardText(love.filesystem.getSaveDirectory( ))
+            love.system.openURL("file://"..love.filesystem.getSaveDirectory())
+            message="opened data directory!"
         end
     else
         if key=="backspace" and string.len(fileName)>0 then

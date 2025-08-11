@@ -24,6 +24,9 @@ end
 
 
 function love.load()
+    initFont("assets/font.png",[===[abcdefghijklmnopqrstuvwxyz !CF0123456789.:(){}-+/*,="'_[]RBSH?<>@#$%^&A]===],5,6)
+    spriteUndo={}
+
     love.window.setTitle("CherryPop")
     love.window.setIcon(love.image.newImageData("assets/windowIcon.png"))
     codeLines={}
@@ -74,7 +77,7 @@ local rand=love.math.random
 --sprite memory: 0x3032 to 0x7032
 
 function love.update()
-    require("lovebird").update()
+    --require("lovebird").update()
 end
 
 num=false

@@ -21,6 +21,9 @@ sb.box={
     sget=api.sget,
     sspr=api.sspr,
     spr=api.spr,
+    mget=api.mget,
+    mset=api.mset,
+    map=api.map,
 
     --input
     btn=api.btn,
@@ -62,8 +65,8 @@ end
 
 function sb.tickCart()
     if not paused then
-    if sb.box._tick then sb.box._tick() end
-    t=t+1
+        if sb.box._tick then sb.box._tick() end
+        t=t+1
     end
 end
 

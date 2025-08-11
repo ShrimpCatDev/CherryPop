@@ -1,7 +1,7 @@
 return {
       name = 'CherryPop',
       config = 'nonsteam',
-      version = '0.1',
+      version = '0.11',
       love = '11.5',
       icon = 'assets/icon.png',
       platforms = {'windows','linux'},

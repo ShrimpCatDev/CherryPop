@@ -1,5 +1,22 @@
 local mem={}
 
+mem.loc={
+    dispStart=0x0000,dispEnd=0x3000,
+    palStart=0x3001,palEnd=0x3031,
+    sprStart=0x3032,sprEnd=0x7032,
+    mapStart=0x7033,mapEnd=0xa033
+}
+
+function mem.resetPal()
+    pal=loadPal("assets/palette1.png")
+    defPal=pal
+    for i=0,15 do
+        mem.poke(mem.loc.palStart+(i*3)+0,pal[i+1].r)
+        mem.poke(mem.loc.palStart+(i*3)+1,pal[i+1].g)
+        mem.poke(mem.loc.palStart+(i*3)+2,pal[i+1].b)
+    end
+end
+
 function mem.init()
     mem.map={}
     if not cartLoaded then
@@ -8,19 +25,13 @@ function mem.init()
             table.insert(mem.map,0)
         end
     end
-    pal=loadPal("assets/palette1.png")
-    defPal=pal
-    for i=0,15 do
-        mem.poke(0x3001+(i*3)+0,pal[i+1].r)
-        mem.poke(0x3001+(i*3)+1,pal[i+1].g)
-        mem.poke(0x3001+(i*3)+2,pal[i+1].b)
-    end
+    mem.resetPal()
 end
 
 function mem.poke(a,v)
     if not type(a) == "number" then return false end
     if not type(v) == "number" then return false end
-    mem.map[a+1]=v%256
+    mem.map[a+1]=math.abs(v)%256
     return true
 end
 

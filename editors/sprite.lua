@@ -20,25 +20,11 @@ function sprite:enter()
     sheetOs=0 --spritesheet selection offset
     sheetImg=lg.newCanvas(128,8*3+1) --spritesheet selection image
 
-    --[[[buttons.reset()
-
-   --[[buttons.new(9,0,8,8,"0000000001100110011001100110011001111110010110100111111000000000",3,13,function()
-        print("switching to sprite")
-        gs.switch(editor.sprite)
-    end)
-    buttons.new(0,0,8,8,"0000000000100100010000100100001001000010010000100010010000000000",3,13,function()
-        print("switching to code")
-        gs.switch(editor.code)
-    end)
-    buttons.new(9,0,8,8,"0000000001100110011001100110011001111110010110100111111000000000",3,13,function()
-        print("switching to sprite")
-        gs.switch(editor.sprite)
-    end)]]
     bar.init()
 end
 
 function sprite:update()
-    require("lovebird").update()
+    --require("lovebird").update()
     --mouse position code
     local x,y=love.mouse.getPosition() --get the mouse position XD
     if x and y then --make sure x and y arent nil
@@ -53,7 +39,7 @@ function sprite:update()
             --sprite editor
             if col(mouse.x,mouse.y,16,16,1,1,8*se,8*se) then
                 if api.sget(math.floor((mouse.x-16)/se +sel.x*8),math.floor((mouse.y-16)/se +sel.y*8))~=color[1] then
-                    api.sset(math.floor((mouse.x-16)/se +sel.x*8),math.floor((mouse.y-16)/se +sel.y*8),color[1])     
+                    api.sset(math.floor((mouse.x-16)/se +sel.x*8),math.floor((mouse.y-16)/se +sel.y*8),color[1])
                 end
             end
             --color picker
@@ -62,9 +48,13 @@ function sprite:update()
                 color[1]=x+(y*4)
             end
             --spritesheet
-            if col(mouse.x,mouse.y,0,72,1,1,128,8*3) then
-                local x,y=math.floor((mouse.x)/8),math.floor(((mouse.y-73+sheetOs)/8))
-                sel.x,sel.y=x,y
+            if col(mouse.x,mouse.y,0,71,1,1,128,8*3) then
+                local x,y=math.floor((mouse.x)/8),math.floor(((mouse.y-72+sheetOs)/8))
+                
+                if y>-1 and y<16 then 
+                    sel.y=y 
+                    sel.x=x
+                end
             end
         end
     end
@@ -112,13 +102,13 @@ function sprite:draw()
     for y=0,127 do
         for x=0,127 do
             love.graphics.setColor(palCol(api.sget(x,y)))
-            lg.points(x,y+1-math.floor(lso))
+            lg.points(x,y-math.floor(lso))
         end
     end
 
     --selection box
     colr(13)
-    lg.rectangle("line",sel.x*8+1,sel.y*8+2-math.floor(lso),7,7)
+    lg.rectangle("line",sel.x*8+1,sel.y*8+1-math.floor(lso),7,7)
     for i=0,15 do
         colr((i%2)+1)
         lg.line(128,i*8-lso,128,i*8+8-lso)
@@ -135,7 +125,7 @@ function sprite:draw()
     --[[love.graphics.setColor(palCol(1))
     lg.rectangle("fill",0,0,128,8)
     buttons.draw()]]
-    bar.draw()
+    
 
     --draw spritesheet rect
     love.graphics.setColor(palCol(0))
@@ -156,16 +146,11 @@ function sprite:draw()
     deco(15,17,50,49)
 
     colr(13)
-    --[[drawFont(tostring(sel.x+(sel.y*16)),1,1)
+    drawFont(tostring(color[1]),79,51)
+    --113
+    drawFont(tostring(sel.x+(sel.y*16)),123-((string.len(tostring(sel.x+(sel.y*16)))-1)*5),66)
 
-    if mouse.x and mouse.y then
-        if col(mouse.x,mouse.y,0,72,1,1,128,8*3) then
-            local x,y=math.floor((mouse.x)/8),math.floor(((mouse.y-71+sheetOs)/8))
-            colr(14)
-            drawFont(tostring(x+(y*16)),8*3+1,1)
-        end
-    end]]
-    
+    bar.draw()
 
      --draw the mouse
     lg.setColor(1,1,1)
@@ -174,6 +159,8 @@ function sprite:draw()
     end
 
     push:finish()
+    --lg.print("x: "..sel.x.." y: "..sel.y,0,0)
+    --lg.print(sheetOs,0,20)
 end
 
 lso=0
@@ -186,9 +173,9 @@ function sprite:mousepressed(x,y,b)
 end
 
 function sprite:wheelmoved(x,y)
-        if y>0 then
+        if y>0 and sheetOs>0 then
             sheetOs=sheetOs-4
-        elseif y<0 then
+        elseif y<0 and sheetOs<104 then
             sheetOs=sheetOs+4
         end
 end
@@ -227,10 +214,8 @@ function sprite:keypressed(k)
         end
 
     end
-    runCartFromEditor(k)
-    if love.keyboard.isDown("lctrl") and k=="s" then
-        save()
-    end
+
+    bar.key(k)
 end
 
 return sprite
