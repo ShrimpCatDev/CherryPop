@@ -6,20 +6,14 @@ function wip:init()
 end
 
 function wip:enter()
-    mouse = {x=0, y=0, img=lg.newImage("assets/mouse.png")}
+    mouse=require("editors/mouse") --define mouse
     bar.init()
     t=0
 end
 
 function wip:update()
     --require("lovebird").update()
-    local x,y = love.mouse.getPosition()
-    if x and y then
-        local xx,yy = push:toGame(x,y)
-        if xx and yy then
-            mouse.x,mouse.y = math.floor(xx),math.floor(yy)
-        end
-    end
+    mouse.update()
     t=t+1
 end
 
@@ -37,10 +31,7 @@ function wip:draw()
         end
         
         bar.draw()
-        lg.setColor(1,1,1)
-        if mouse.x and mouse.y then
-            lg.draw(mouse.img,mouse.x,mouse.y)
-        end
+        mouse.draw()
         
     push:finish()
 end

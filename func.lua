@@ -87,11 +87,20 @@ function save()
         cart=cart..v.."\n"
     end
     local data = "#CODE\n"
-    data = data .. cart .. "\n"
+    data = data .. cart
     data = data .. "#SPRITE\n"
     for i=0,(128*128)-1 do
         data = data .. string.sub(hex,mem.peek(0x3032+i)+1,mem.peek(0x3032+i)+1)
     end
+    --string.format("%X", 255)
+    --0x7033
+    data=data.."\n#MAP\n"
+    for i=0,(128*96)-1 do
+        local str=string.format("%02X", mem.peek(mem.loc.mapStart+i))
+        data=data..str
+    end
+
+    --data=data.."hello world"
     writeToFile(name,data)
 end
 
@@ -103,6 +112,11 @@ function runCartCode()
     for y=0,127 do
         for x=0,127 do
             loadSheet[x+(y*128)+1]=api.sget(x,y)
+        end
+    end
+    for y=0,95 do
+        for x=0,127 do
+            mapSheet[x+(y*128)+1]=api.mget(x,y)
         end
     end
     api.cls(0)

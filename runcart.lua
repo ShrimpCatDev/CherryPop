@@ -3,12 +3,19 @@ local runCart={}
 function runCart:enter(p,arg)
     api.setup()
     api.cls()
-    
+    for i=0,0xffff do
+        mem.poke(i,0)
+    end
     print("cart loaded!")
     math.randomseed(love.math.random(0,99999999999))
     if #loadSheet>0 then
         for i=0,#loadSheet-1 do
             mem.poke(0x3032+i,loadSheet[i+1])
+        end
+    end
+    if #mapSheet>0 then
+        for i=0,#mapSheet-1 do
+            mem.poke(mem.loc.mapStart+i,mapSheet[i+1])
         end
     end
     mem.resetPal()
@@ -103,6 +110,7 @@ function runCart:draw()
     end
 
     push:finish()
+    --lg.print(love.timer.getFPS())
 end
 
 function runCart:keypressed(k)

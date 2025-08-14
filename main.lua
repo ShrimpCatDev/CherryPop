@@ -35,6 +35,7 @@ function love.load()
     buttons=require("buttons")
     bar=require("editors/bar")
     loadSheet={}
+    mapSheet={}
     lg.setLineStyle("rough")
     
     local pnt=love.graphics.points
@@ -54,6 +55,7 @@ function love.load()
     editor={}
     editor.sprite=require("editors/sprite")
     editor.code=require("editors/code")
+    editor.map=require("editors/map")
     editor.wip=require("editors/wip")
     editor.error=require("editors/error")
 
@@ -63,6 +65,7 @@ function love.load()
     codeInit=false
     codeLines={}
     gs.switch(menuProg)
+    
 end
 
 function love.wheelmoved(x,y)
@@ -88,6 +91,13 @@ function love.draw()
     
    
     
+end
+
+fullscreen=false
+function love.keypressed(k)
+    if k=="f11" then
+        push:switchFullscreen()
+    end
 end
 
 function love.resize(w, h)

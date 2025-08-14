@@ -9,7 +9,7 @@ local se=6 --scale of sprite editor
 
 
 function sprite:enter()
-    mouse={x=0,y=0,img=lg.newImage("assets/mouse.png")} --define mouse
+    mouse=require("editors/mouse") --define mouse
     if not mem.map and not cartLoaded then mem.init() end --fix missing memory if thats an issue
     Sclip={} --clipbboard
     Sundo={} --undo variable (TODO)
@@ -18,6 +18,7 @@ function sprite:enter()
     sel={x=0,y=0} --selection position
     color={0,2,lg.newImage("assets/selectedColor.png")} --color selection image (TODO: change to non-png drawable)
     sheetOs=0 --spritesheet selection offset
+    lso=0
     sheetImg=lg.newCanvas(128,8*3+1) --spritesheet selection image
 
     bar.init()
@@ -26,13 +27,7 @@ end
 function sprite:update()
     --require("lovebird").update()
     --mouse position code
-    local x,y=love.mouse.getPosition() --get the mouse position XD
-    if x and y then --make sure x and y arent nil
-        local xx,yy=push:toGame(x,y) --convert screen coords to pixel coords using push
-        if xx and yy then --check if xx and yy are nil
-            mouse.x,mouse.y=math.floor(xx),math.floor(yy) --set the mouse position
-        end
-    end
+    mouse.update()
 
     if mouse.x and mouse.y then
         if love.mouse.isDown(1) then
@@ -153,10 +148,7 @@ function sprite:draw()
     bar.draw()
 
      --draw the mouse
-    lg.setColor(1,1,1)
-    if mouse.x and mouse.y then
-        lg.draw(mouse.img,mouse.x,mouse.y)
-    end
+    mouse.draw()
 
     push:finish()
     --lg.print("x: "..sel.x.." y: "..sel.y,0,0)

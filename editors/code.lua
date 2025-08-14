@@ -21,7 +21,7 @@ function codeEdit:enter()
     print("CODE:")
     print(cart)
     scroll={x=0,y=0}
-    mouse = {x=0, y=0, img=lg.newImage("assets/mouse.png")}
+    mouse=require("editors/mouse") --define mouse
     bar.init()
     --if codeInit then
         codeLines={}--mysplit(cart, "\n")
@@ -59,14 +59,8 @@ function codeEdit:leave()
 end
 
 function codeEdit:update()
-    require("lovebird").update()
-    local x,y = love.mouse.getPosition()
-    if x and y then
-        local xx,yy = push:toGame(x,y)
-        if xx and yy then
-            mouse.x,mouse.y = math.floor(xx),math.floor(yy)
-        end
-    end
+    --require("lovebird").update()
+    mouse.update()
 end
 
 function codeEdit:draw()
@@ -94,10 +88,7 @@ function codeEdit:draw()
         end
 
         bar.draw()
-        lg.setColor(1,1,1)
-        if mouse.x and mouse.y then
-            lg.draw(mouse.img,mouse.x,mouse.y)
-        end
+        mouse.draw()
         
     push:finish()
     --lg.print(scroll.x,0,0)

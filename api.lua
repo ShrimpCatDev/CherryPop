@@ -130,10 +130,15 @@ local function Color(hex, value)
 end
 
 --palette memory: 0xd000 to 0xd030 NEW: 0x3001 to 0x3031
+
+function api.color(hex, value)
+	return {tonumber(string.sub(hex, 2, 3), 16), tonumber(string.sub(hex, 4, 5), 16), tonumber(string.sub(hex, 6, 7), 16), value or 1}
+end
+
 function api.palset(c,r,g,b)
-        mem.poke(mem.loc.palStart+(c%16*3)+0,r)
-        mem.poke(mem.loc.palStart+(c%16*3)+1,g)
-        mem.poke(mem.loc.palStart+(c%16*3)+2,b)
+    mem.poke(mem.loc.palStart+(c%16*3)+0,r)
+    mem.poke(mem.loc.palStart+(c%16*3)+1,g)
+    mem.poke(mem.loc.palStart+(c%16*3)+2,b)
 end
 
 function api.palget(c)
@@ -201,7 +206,7 @@ function api.mget(x,y)
     if x>=0 and x<=127 and y>=0 and y<=95 then
         return mem.peek(mem.loc.mapStart+(y*128)+x)
     else
-        return 0
+        return -1
     end
 end
 
@@ -212,8 +217,12 @@ function api.mset(x,y,t)
 end
 
 function api.map(mx,my,mw,mh,dx,dy,tc)
-    for y=(my or 0),(my or 0)+(mh-1 or 95) do
-        for x=(mx or 0),(mx or 0)+(mw-1 or 127) do
+    local mx1=mx or 0
+    local my1=my or 0
+    local mw1=mw or 128
+    local mh1=mh or 96
+    for y=my1,my1+mh1-1 do
+        for x=mx1,mx1+mw1-1 do
             api.spr(api.mget(x,y),(x*8)+(dx or 0),(y*8)+(dy or 0),(tc or 0))
         end
     end
