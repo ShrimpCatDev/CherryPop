@@ -1,4 +1,5 @@
 love.graphics.setDefaultFilter("nearest","nearest")
+moonshine=require('lib/moonshine')
 push=require("lib/push")
 push:setupScreen(128,96,128*5,96*5,{resizable=true,pixelperfect=true})
 
@@ -24,6 +25,10 @@ end
 
 
 function love.load()
+    camera={x=0,y=0}
+    effect = moonshine(moonshine.effects.filmgrain)
+                    .chain(moonshine.effects.vignette)
+    effect.filmgrain.size = 2
     initFont("assets/font.png",[===[abcdefghijklmnopqrstuvwxyz !CF0123456789.:(){}-+/*,="'_[]RBSH?<>@#$%^&A]===],5,6)
     spriteUndo={}
 

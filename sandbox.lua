@@ -25,6 +25,9 @@ sb.box={
     mget=api.mget,
     mset=api.mset,
     map=api.map,
+    camera=api.camera,
+    circ=api.circ,
+    circfill=api.circfill,
 
     --input
     btn=api.btn,
@@ -47,6 +50,7 @@ sb.box={
 end]]
 
 function sb.initCart(code)
+    camera={x=0,y=0}
     sb.box._load=nil
     sb.box._tick=nil
     func, err = loadstring(code)

@@ -16,6 +16,7 @@ function mysplit(inputstr, sep)
     end
     return t
 end
+local codeSelection={x=0,y=0,active=false}
 
 function codeEdit:enter()
     print("CODE:")
@@ -48,7 +49,7 @@ function codeEdit:enter()
             codeLines[1]=""
         end
     --end
-    selection={x=0,y=0}
+    selection={x=0,y=0,endX=0,endY=0,color=6}
 end
 
 function codeEdit:leave()

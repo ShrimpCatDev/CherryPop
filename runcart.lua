@@ -80,7 +80,8 @@ function runCart:update()
 end
 
 function runCart:draw()
-    push:start()   
+    push:start()  
+    
     sb.tickCart()
     
     for y=0,95 do
@@ -108,7 +109,7 @@ function runCart:draw()
             end
         end
     end
-
+    
     push:finish()
     --lg.print(love.timer.getFPS())
 end

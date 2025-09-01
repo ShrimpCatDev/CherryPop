@@ -71,6 +71,10 @@ function api.btn(num)
     end
 end
 
+function api.camera(x,y)
+    camera.x,camera.y=x,y
+end
+
 function api.btnp(num)
     if num<=6 and num>=0 then
         return api.inputPressed[num+1]
@@ -79,7 +83,9 @@ function api.btnp(num)
     end
 end
 
-function api.pset(x,y,c)
+function api.pset(xx,yy,c)
+    local x=xx-camera.x
+    local y=yy-camera.y
     if x>=0 and x<=127 and y>=0 and y<=95 then
         if c then
             mem.poke(mem.loc.dispStart+mem.toDisp(x,y),c)
@@ -114,12 +120,57 @@ function api.rect(x,y,w,h,c)
     end
 end
 
+function api.circ(xc,yc,rd,c)
+    local r=math.floor(rd)
+    local x = 0
+    local y = r
+    local d = 1 - r
+    api.pset(xc + x, yc + y,c)
+    api.pset(xc - x, yc + y,c)
+    api.pset(xc + x, yc - y,c)
+    api.pset(xc - x, yc - y,c)
+    api.pset(xc + y, yc + x,c)
+    api.pset(xc - y, yc + x,c)
+    api.pset(xc + y, yc - x,c)
+    api.pset(xc - y, yc - x,c)
+    
+    while x < y do
+        x = x + 1
+        if d < 0 then
+            d = d + 2 * x + 1
+        else
+            y = y - 1
+            d = d + 2 * (x - y) + 1
+        end
+        api.pset(xc + x, yc + y,c)
+        api.pset(xc - x, yc + y,c)
+        api.pset(xc + x, yc - y,c)
+        api.pset(xc - x, yc - y,c)
+        api.pset(xc + y, yc + x,c)
+        api.pset(xc - y, yc + x,c)
+        api.pset(xc + y, yc - x,c)
+        api.pset(xc - y, yc - x,c)
+    end
+end
+
+function api.circfill(x,y,ra,c)
+    local rad=math.floor(ra)
+    for px=x-rad,x+rad do
+        for py=y-rad,y+rad do
+            local dx,dy = px-x, py-y
+            if dx*dx + dy*dy <= rad*rad then
+                api.pset(px,py,c)
+            end
+        end
+    end
+    api.circ(x,y,ra,c)
+end
 
 function api.cls(c)
     local cc=c or 0
     for x=0,127 do
         for y=0,95 do
-            api.pset(x,y,cc)
+            api.pset(x+camera.x,y+camera.y,cc)
         end
     end
     print("screen cleared")
