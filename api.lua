@@ -274,9 +274,10 @@ function api.map(mx,my,mw,mh,dx,dy,tc)
     local mh1=mh or 96
     for y=my1,my1+mh1-1 do
         for x=mx1,mx1+mw1-1 do
-            api.spr(api.mget(x,y),(x*8)+(dx or 0),(y*8)+(dy or 0),(tc or 0))
+            api.spr(api.mget(x,y),(x*8)+(dx or 0)-(mx1*8),(y*8)+(dy or 0)-(my1*8),(tc or 0))
         end
     end
+    --api.print(tostring(my),0,0,10)
 end
 
 return api

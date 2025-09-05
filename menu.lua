@@ -112,7 +112,7 @@ function menu:enter()
 
     makingFile=false
     fileName=""
-    local isFile = love.filesystem.getInfo("TextDemo.chp")
+    local isFile = love.filesystem.getInfo("textdemo.chp")
     --[[if not isFile then
         love.filesystem.write("textdemo.chp", demo)
     end]]
