@@ -37,7 +37,8 @@ sb.box={
     math=math,
     ipairs=ipairs,
     pairs=pairs,
-    table=table
+    table=table,
+    string=string
 }
 
 --[[function sb.initCart(code)
@@ -49,20 +50,26 @@ sb.box={
     ran=true
 end]]
 
+function yeetError(err)
+    gs.switch(editor.error,err)
+end
+
 function sb.initCart(code)
     camera={x=0,y=0}
     sb.box._load=nil
     sb.box._tick=nil
     func, err = loadstring(code)
+
     if not func then
         gs.switch(editor.error,err)
         return
     end
 
     setfenv(func,sb.box)
-    
-    func()
-    if sb.box._load then sb.box._load() end
+
+    xpcall(func,yeetError)
+
+    if sb.box._load then xpcall(sb.box._load,yeetError)  end
     ran=true
     paused=false
 end
@@ -70,7 +77,7 @@ end
 
 function sb.tickCart()
     if not paused then
-        if sb.box._tick then sb.box._tick() end
+        if sb.box._tick then xpcall(sb.box._tick,yeetError)  end
         t=t+1
     end
 end

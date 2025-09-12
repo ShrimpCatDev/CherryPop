@@ -1,5 +1,8 @@
 local codeEdit = {}
 local scroll={}
+local blink=0
+local blinkooldown=0
+local active=false
 
 
 function codeEdit:init()
@@ -19,6 +22,9 @@ end
 local codeSelection={x=0,y=0,active=false}
 
 function codeEdit:enter()
+    active=false
+    blinkooldown=0
+    blink=0
     print("CODE:")
     print(cart)
     scroll={x=0,y=0}
@@ -50,6 +56,8 @@ function codeEdit:enter()
         end
     --end
     selection={x=0,y=0,endX=0,endY=0,color=6}
+    selectionStart={x=0,y=0}
+    selectionEnd={x=0,y=0}
 end
 
 function codeEdit:leave()
@@ -60,8 +68,24 @@ function codeEdit:leave()
 end
 
 function codeEdit:update()
+    blinkooldown=blinkooldown-1
     --require("lovebird").update()
     mouse.update()
+    blink=blink+0.05
+    if active then
+        if mouse.x>=1 and mouse.y>8 then
+            local smx = math.floor((mouse.x-1) / font.w)
+            local smy = math.floor((mouse.y-(font.h/2)) / font.h)
+
+            local lineIndex = smy - 1 - scroll.y
+            lineIndex = math.max(0, math.min(#codeLines - 1, lineIndex)) -- clamp to valid range
+
+            selectionEnd.y = lineIndex
+
+            local line = codeLines[selectionEnd.y + 1] or ""
+            selectionEnd.x = math.min(#line, smx - scroll.x)
+        end
+    end
 end
 
 function codeEdit:draw()
@@ -77,12 +101,23 @@ function codeEdit:draw()
         local otherEnd=[[]]
         ofs=0
 
-        colr(6)
-        lg.rectangle("fill",(selection.x*font.w)+(scroll.x*font.w)+1,(selection.y*font.h)+(scroll.y*font.h)+9,font.w,font.h)
+        if math.floor(blink)%2==0 or blinkooldown>0 then
+            colr(6)
+            lg.rectangle("fill",(selection.x*font.w)+(scroll.x*font.w)+1,(selection.y*font.h)+(scroll.y*font.h)+9,font.w,font.h)
+        end
 
         local color=13
 
         for i,v in ipairs(codeLines) do
+            colr(7)
+            --[[local arg=selectionStart.y==selectionEnd.y and selectionStart.x==selectionEnd.x
+            if selectionStart.y<=i-1 and selectionEnd.y>=i-1 and not arg then
+                if i-1<selectionEnd.y then
+                    lg.rectangle("fill",(scroll.x*font.w)+1,(i*font.h)+(scroll.y*font.h)+3,string.len(v)*5,6)
+                else
+                    lg.rectangle("fill",(scroll.x*font.w)+1,(i*font.h)+(scroll.y*font.h)+3,(string.len(v)-(string.len(v)-selectionEnd.x))*5,6)
+                end
+            end]]
             colr(color)
             drawFont(v,(scroll.x*font.w)+1,(i*font.h)+(scroll.y*font.h)+3)
             --drawChar(string.sub(cart,i,i),(ii*7)+1,9+(lineBreak*8)+(scroll.y*8))
@@ -111,9 +146,34 @@ function codeEdit:mousepressed(x, y, b)
 
             local line = codeLines[selection.y + 1] or ""
             selection.x = math.min(#line, smx - scroll.x)
+
+            selectionStart=selection
+            active=true
+            cooldown=30
         end
     end
 end
+
+function codeEdit:mousereleased(x, y, b)
+    if b == 1 then
+        if mouse.y < 8 then
+            bar.press(b)
+        elseif mouse.x>=1 then
+            --[[local smx = math.floor((mouse.x-1) / font.w)
+            local smy = math.floor((mouse.y-(font.h/2)) / font.h)
+
+            local lineIndex = smy - 1 - scroll.y
+            lineIndex = math.max(0, math.min(#codeLines - 1, lineIndex)) -- clamp to valid range
+
+            selectionEnd.y = lineIndex
+
+            local line = codeLines[selectionEnd.y + 1] or ""
+            selectionEnd.x = math.min(#line, smx - scroll.x)]]
+            active=false
+        end
+    end
+end
+
 
 
 function codeEdit:wheelmoved(x,y)
@@ -130,7 +190,8 @@ local function removeCharAt(str, index)
 end
 
 function codeEdit:keypressed(k)
-
+    
+    blinkooldown=30
     bar.key(k)
 
     if k=="backspace" then
@@ -203,6 +264,17 @@ function codeEdit:keypressed(k)
         end
         
     end
+    if k=="home" then
+        selection.x=0
+    end
+    if k=="end" then
+        selection.x=#codeLines[selection.y+1]
+    end
+    if k=="tab" then
+        codeLines[selection.y+1]=insertCharAt(codeLines[selection.y+1],selection.x," ")
+        selection.x=selection.x+1
+    end
+
     local scrollStartY=math.floor(96/font.h)-3--13
     local scrollStartX=math.floor(128/font.w)-2--23
     --down
@@ -223,6 +295,7 @@ function codeEdit:keypressed(k)
     end
     
     scroll.x=math.min(scroll.x,0)
+    
 end
 
 
@@ -231,6 +304,7 @@ function insertCharAt(str, index, char)
 end
 
 function codeEdit:textinput(k)
+    blinkooldown=30
     codeLines[selection.y+1]=insertCharAt(codeLines[selection.y+1],selection.x,k)
     selection.x=selection.x+1
     print(k)
