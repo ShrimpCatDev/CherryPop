@@ -112,6 +112,7 @@ function runCart:draw()
     
     push:finish()
     --lg.print(love.timer.getFPS())
+    --lg.print(tick.frame)
 end
 
 function runCart:keypressed(k)

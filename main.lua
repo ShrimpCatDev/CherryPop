@@ -1,7 +1,10 @@
+tick=require 'lib/tick'
+
 love.graphics.setDefaultFilter("nearest","nearest")
 moonshine=require('lib/moonshine')
 push=require("lib/push")
 push:setupScreen(128,96,128*5,96*5,{resizable=true,pixelperfect=true})
+
 
 require("func")
 local api=require("api")
@@ -24,7 +27,8 @@ function love.textinput(txt)
 end
 
 
-function love.load()
+function love.load(arg)
+    tick.framerate=60
     camera={x=0,y=0}
     effect = moonshine(moonshine.effects.filmgrain)
                     .chain(moonshine.effects.vignette)
