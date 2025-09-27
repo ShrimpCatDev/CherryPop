@@ -13,7 +13,9 @@ end
 function ms.draw()
     lg.setColor(1,1,1)
     if mouse.x and mouse.y then
-        lg.draw(mouse.img,mouse.x,mouse.y)
+        --lg.draw(mouse.img,mouse.x,mouse.y)
+        drawBinary("0000000001000000011000000111000001111000011000000001000000000000",mouse.x,mouse.y,13)
+        drawBinary("0100000010100000100100001000100010000100100110000110100000000000",mouse.x,mouse.y,0)
     end
 end
 

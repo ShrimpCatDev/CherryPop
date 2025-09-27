@@ -1,5 +1,7 @@
 local sprite={}
 
+
+
 local function col(ax,ay,bx,by,aw,ah,bw,bh)
     return ax<bx+bw and bx<ax and ay<by+bh and by<ay
 end
@@ -18,6 +20,9 @@ function sprite:init()
 end
 
 function sprite:enter()
+
+    self.mode="draw"
+
     mouse=require("editors/mouse") --define mouse
     if not mem.map and not cartLoaded then mem.init() end --fix missing memory if thats an issue
     
@@ -37,6 +42,11 @@ function sprite:enter()
     sheetImg=lg.newCanvas(128,8*3+1) --spritesheet selection image
 
     bar.init()
+
+    --draw mode button
+    buttons.new(116,16,8,8,"0000000000000100000011100001110000111000011100000110000000000000",3,13,function()
+        self.mode="draw"
+    end)
 end
 
 function sprite:update()
@@ -48,8 +58,12 @@ function sprite:update()
         if love.mouse.isDown(1) then
             --sprite editor
             if col(mouse.x,mouse.y,16,16,1,1,8*se,8*se) then
-                if api.sget(math.floor((mouse.x-16)/se +sel.x*8),math.floor((mouse.y-16)/se +sel.y*8))~=color[1] then
-                    api.sset(math.floor((mouse.x-16)/se +sel.x*8),math.floor((mouse.y-16)/se +sel.y*8),color[1])
+                if self.mode=="draw" then
+                    if api.sget(math.floor((mouse.x-16)/se +sel.x*8),math.floor((mouse.y-16)/se +sel.y*8))~=color[1] then
+                        api.sset(math.floor((mouse.x-16)/se +sel.x*8),math.floor((mouse.y-16)/se +sel.y*8),color[1])
+                    end
+                else
+
                 end
             end
             --color picker
@@ -102,8 +116,9 @@ function sprite:draw()
         for x=0,3 do
             love.graphics.setColor(palCol(x+(y*4)))
             lg.rectangle("fill",x*8,(y)*8,8,8)
-            love.graphics.setColor(palCol(13))
-            lg.draw(color[3],(color[1]%4)*8,math.floor(color[1]/4)*8)
+            --love.graphics.setColor(palCol(13))
+            --lg.draw(color[3],(color[1]%4)*8,math.floor(color[1]/4)*8)
+            drawBinary("1110000011000000100000000000000000000000000000000000000000000000",(color[1]%4)*8,math.floor(color[1]/4)*8,13)
         end
     end
 
@@ -166,7 +181,7 @@ function sprite:draw()
     mouse.draw()
 
     push:finish()
-    --lg.print("x: "..sel.x.." y: "..sel.y,0,0)
+    --lg.print("x: "..mouse.x.." y: "..mouse.y,0,0)
     --lg.print(love.timer.getFPS(),0,20)
 end
 

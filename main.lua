@@ -115,3 +115,17 @@ end
 function love.resize(w, h)
     return push:resize(w, h)
 end
+
+function drawBinary(txt,xx,yy,clr)
+    local e=0
+    for y=0,7 do
+        for x=0,7 do
+            e=e+1
+            if string.sub(txt,e,e)=="1" then
+                colr(clr)
+                lg.points(xx+x,yy+y)
+            end
+            
+        end
+    end
+end

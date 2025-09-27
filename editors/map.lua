@@ -138,6 +138,7 @@ function map:draw()
 
         colr(2)
         lg.rectangle("fill",0,96-8,128,8)
+        
         if not love.mouse.isDown(1) then
             colr(13)
             drawFont(selectedTile,1,9)
