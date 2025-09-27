@@ -279,7 +279,7 @@ function sprite:draw()
     push:finish()
     --lg.print("x: "..mouse.x.." y: "..mouse.y,0,0)
     --lg.print(love.timer.getFPS(),0,20)
-    lg.print(tostring(self.rect.down))
+    lg.print(tostring(self.mode))
 end
 
 lso=0
@@ -295,58 +295,102 @@ function sprite:mousepressed(x,y,b)
         self.rect.w=0
         self.rect.h=0
     end
-    if self.mode=="fill" and b==1 and col(mouse.x,mouse.y,16,16,1,1,8*se,8*se) then
-        local xx,yy=math.floor((mouse.x-16)/se +sel.x*8),math.floor((mouse.y-17)/se +sel.y*8)
-        
-    end
-
+    
 end
 
 function sprite:mousereleased(x2,y2,b)
-    if b==1 and self.mode=="rect" and self.rect.down and col(mouse.x,mouse.y,16,16,1,1,8*se,8*se) then
-        local x,y=math.floor((mouse.x-16)/se +sel.x*8),math.floor((mouse.y-17)/se +sel.y*8)
-        --api.sset(x,y,color[1])
-        --api.sset(self.rect.x,self.rect.y,color[1])
-        local t={}
-        local dx,dy=1,1
-        if x>= self.rect.x then
-            dx=1
-        else
-            dx=-1
-        end
-        if y>= self.rect.y then
-            dy=1
-        else
-            dy=-1
-        end
-
-        local xx,yy=self.rect.x,self.rect.y
-
-        if love.keyboard.isDown("lshift") then
-            for x1=self.rect.x,x,dx do
-                table.insert(t,{x=x1,y=yy,c=api.sget(x1,yy)})
-                table.insert(t,{x=x1,y=y,c=api.sget(x1,y)})
-                api.sset(x1,yy,color[1])
-                api.sset(x1,y,color[1])
+    if b==1 and col(mouse.x,mouse.y,16,16,1,1,8*se,8*se) then
+        if self.mode=="rect" then
+            if self.rect.down then
+            local x,y=math.floor((mouse.x-16)/se +sel.x*8),math.floor((mouse.y-17)/se +sel.y*8)
+            --api.sset(x,y,color[1])
+            --api.sset(self.rect.x,self.rect.y,color[1])
+            local t={}
+            local dx,dy=1,1
+            if x>= self.rect.x then
+                dx=1
+            else
+                dx=-1
             end
-            for y1=self.rect.y,y,dy do
-                table.insert(t,{x=xx,y=y1,c=api.sget(xx,y1)})
-                table.insert(t,{x=x,y=y,c=api.sget(x,y1)})
-                api.sset(xx,y1,color[1])
-                api.sset(x,y1,color[1])
+            if y>= self.rect.y then
+                dy=1
+            else
+                dy=-1
             end
-        else
-            for x1=self.rect.x,x,dx do
+
+            local xx,yy=self.rect.x,self.rect.y
+
+            if love.keyboard.isDown("lshift") then
+               for x1=self.rect.x,x,dx do
+                   table.insert(t,{x=x1,y=yy,c=api.sget(x1,yy)})
+                    table.insert(t,{x=x1,y=y,c=api.sget(x1,y)})
+                    api.sset(x1,yy,color[1])
+                    api.sset(x1,y,color[1])
+                end
                 for y1=self.rect.y,y,dy do
-                    table.insert(t,{x=x1,y=y1,c=api.sget(x1,y1)})
-                    api.sset(x1,y1,color[1])
+                    table.insert(t,{x=xx,y=y1,c=api.sget(xx,y1)})
+                    table.insert(t,{x=x,y=y,c=api.sget(x,y1)})
+                    api.sset(xx,y1,color[1])
+                    api.sset(x,y1,color[1])
+                end
+            else
+                for x1=self.rect.x,x,dx do
+                    for y1=self.rect.y,y,dy do
+                        table.insert(t,{x=x1,y=y1,c=api.sget(x1,y1)})
+                        api.sset(x1,y1,color[1])
+                    end
                 end
             end
+
+            table.insert(self.undo,t)
+
+            self.rect.down=false
         end
+        elseif self.mode=="fill" then
 
-        table.insert(self.undo,t)
+            local dir={
+                {x=1,y=0},
+                {x=-1,y=0},
+                {x=0,y=1},
+                {x=0,y=-1}
+            }
 
-        self.rect.down=false
+            local xx,yy=math.floor((mouse.x-16)/se +sel.x*8),math.floor((mouse.y-17)/se +sel.y*8)
+
+            local q={{x=xx,y=yy}}
+
+            local old=api.sget(xx,yy)
+
+            local t={}
+            local w,h=8,8
+
+            for x=sel.x*8,sel.x*8+w do
+                for y=sel.y*8,sel.y*8+h do
+                    table.insert(t,{x=x,y=y,c=api.sget(x,y)})
+                end
+            end
+
+            while #q>0 do
+                local p=table.remove(q,1)
+                
+                api.sset(p.x,p.y,color[1])
+
+                
+
+                for k,v in pairs(dir) do
+                    if api.sget(p.x+v.x,p.y+v.y)==old and p.x+v.x>=sel.x*8 and p.x+v.x<sel.x*8+w and p.y+v.y>=sel.y*8 and p.y+v.y<sel.y*8+h then
+                        --table.insert(t,{x=p.x+v.x,y=p.y+v.y,c=api.sget(p.x+v.x,p.y+v.y)})
+                        table.insert(q,{x=p.x+v.x,y=p.y+v.y})
+                    end
+                end
+                
+            end
+
+            table.insert(self.undo,t)
+ 
+        end
+    else
+
     end
 end
 
