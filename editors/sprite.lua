@@ -39,14 +39,16 @@ local function copy()
 end
 
 local function paste()
-    local t={}
-    for x1=0,7 do
-        for y1=0,7 do
-            table.insert(t,{x=x1+sel.x*8,y=y1+sel.y*8,c=api.sget(x1+sel.x*8,y1+sel.y*8)})
-            api.sset(x1+sel.x*8,y1+sel.y*8,Sclip[x1+(y1*8)+1])
+    if #Sclip>0 then
+        local t={}
+        for x1=0,7 do
+            for y1=0,7 do
+                table.insert(t,{x=x1+sel.x*8,y=y1+sel.y*8,c=api.sget(x1+sel.x*8,y1+sel.y*8)})
+                api.sset(x1+sel.x*8,y1+sel.y*8,Sclip[x1+(y1*8)+1])
+            end
         end
+        table.insert(sprite.undo,t)
     end
-    table.insert(sprite.undo,t)
 end
 
 local function delete()
@@ -83,6 +85,8 @@ end
 
 function sprite:enter()
 
+    self.rect={down=false,x=0,y=0,w=0,h=0}
+
     self.mode="draw"
 
     mouse=require("editors/mouse") --define mouse
@@ -94,7 +98,7 @@ function sprite:enter()
 
     if self.boot then
         sel={x=0,y=0} --selection position
-        Sclip={} --clipbboard
+        --Sclip={} --clipbboard
         sheetOs=0 --spritesheet selection offset
         lso=0
         self.boot=false
@@ -111,6 +115,11 @@ function sprite:enter()
     buttons.new(116,16,8,8,"0000000000000100000011100001110000111000011100000110000000000000",3,13,function()
         self.mode="draw"
     end)
+    --rectangle button
+    buttons.new(116,24,8,8,"0000000001111100010001000101111001011110011111100001111000000000",3,13,function()
+        self.mode="rect"
+    end)
+
     local bos=78
     buttons.new(bos,57,8,8,"0000000000100000011111000010001000000010011111000000000000000000",3,12,function()
         undo()
@@ -265,14 +274,72 @@ function sprite:draw()
     mouse.draw()
 
     push:finish()
-    lg.print("x: "..mouse.x.." y: "..mouse.y,0,0)
+    --lg.print("x: "..mouse.x.." y: "..mouse.y,0,0)
     --lg.print(love.timer.getFPS(),0,20)
+    lg.print(tostring(self.rect.down))
 end
 
 lso=0
 
 function sprite:mousepressed(x,y,b)
     bar.press(b)
+    --self.rect={down=false,x=0,y=0,w=0,h=0}
+    if self.mode=="rect" and b==1 and col(mouse.x,mouse.y,16,16,1,1,8*se,8*se) then
+        self.rect.down=true
+        local x,y=math.floor((mouse.x-16)/se +sel.x*8),math.floor((mouse.y-17)/se +sel.y*8)
+        self.rect.x=x
+        self.rect.y=y
+        self.rect.w=0
+        self.rect.h=0
+    end
+end
+
+function sprite:mousereleased(x2,y2,b)
+    if b==1 and self.mode=="rect" and self.rect.down and col(mouse.x,mouse.y,16,16,1,1,8*se,8*se) then
+        local x,y=math.floor((mouse.x-16)/se +sel.x*8),math.floor((mouse.y-17)/se +sel.y*8)
+        --api.sset(x,y,color[1])
+        --api.sset(self.rect.x,self.rect.y,color[1])
+        local t={}
+        local dx,dy=1,1
+        if x>= self.rect.x then
+            dx=1
+        else
+            dx=-1
+        end
+        if y>= self.rect.y then
+            dy=1
+        else
+            dy=-1
+        end
+
+        local xx,yy=self.rect.x,self.rect.y
+
+        if love.keyboard.isDown("lshift") then
+            for x1=self.rect.x,x,dx do
+                table.insert(t,{x=x1,y=yy,c=api.sget(x1,yy)})
+                table.insert(t,{x=x1,y=y,c=api.sget(x1,y)})
+                api.sset(x1,yy,color[1])
+                api.sset(x1,y,color[1])
+            end
+            for y1=self.rect.y,y,dy do
+                table.insert(t,{x=xx,y=y1,c=api.sget(xx,y1)})
+                table.insert(t,{x=x,y=y,c=api.sget(x,y1)})
+                api.sset(xx,y1,color[1])
+                api.sset(x,y1,color[1])
+            end
+        else
+            for x1=self.rect.x,x,dx do
+                for y1=self.rect.y,y,dy do
+                    table.insert(t,{x=x1,y=y1,c=api.sget(x1,y1)})
+                    api.sset(x1,y1,color[1])
+                end
+            end
+        end
+
+        table.insert(self.undo,t)
+
+        self.rect.down=false
+    end
 end
 
 function sprite:wheelmoved(x,y)
@@ -282,8 +349,6 @@ function sprite:wheelmoved(x,y)
         sheetOs=sheetOs+4
     end
 end
-
-
 
 function sprite:keypressed(k)
     if love.keyboard.isDown("lctrl") and k=="z" then
