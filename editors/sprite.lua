@@ -6,17 +6,34 @@ end
 
 local se=6 --scale of sprite editor
 
+local sheetOs=0
+
+function sprite:init()
+    sel={x=0,y=0} --selection position
+    Sclip={} --clipbboard
+    sheetOs=0 --spritesheet selection offset
+    lso=0
+    self.boot=false
+    color={0,2,lg.newImage("assets/selectedColor.png")} --color selection image (TODO: change to non-png drawable)
+end
+
 function sprite:enter()
     mouse=require("editors/mouse") --define mouse
     if not mem.map and not cartLoaded then mem.init() end --fix missing memory if thats an issue
-    Sclip={} --clipbboard
+    
     Sundo={} --undo variable (TODO)
     sprImg=love.graphics.newCanvas(8,8) --sprite edit canvas
     colorSel=lg.newCanvas(32,32) --color selection canvas
-    sel={x=0,y=0} --selection position
-    color={0,2,lg.newImage("assets/selectedColor.png")} --color selection image (TODO: change to non-png drawable)
-    sheetOs=0 --spritesheet selection offset
-    lso=0
+
+    if self.boot then
+        sel={x=0,y=0} --selection position
+        Sclip={} --clipbboard
+        sheetOs=0 --spritesheet selection offset
+        lso=0
+        self.boot=false
+        color={0,2,lg.newImage("assets/selectedColor.png")} --color selection image (TODO: change to non-png drawable)
+    end
+
     sheetImg=lg.newCanvas(128,8*3+1) --spritesheet selection image
 
     bar.init()
@@ -52,9 +69,9 @@ function sprite:update()
         end
     end
     if lso<sheetOs then
-        lso=lso+2
+        lso=lso+4
     elseif lso>sheetOs then
-        lso=lso-2
+        lso=lso-4
     end
 end
 
@@ -150,7 +167,7 @@ function sprite:draw()
 
     push:finish()
     --lg.print("x: "..sel.x.." y: "..sel.y,0,0)
-    --lg.print(sheetOs,0,20)
+    --lg.print(love.timer.getFPS(),0,20)
 end
 
 lso=0

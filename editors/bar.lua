@@ -30,7 +30,7 @@ function bar.init()
         runCartCode()
     end)
     buttons.new(112,0,8,8,"0000000000111100011001100000011000001100000000000001100000000000",3,13,function()
-        love.system.openURL("https://github.com/ShrimpCatDev/CherryPop")
+        love.system.openURL("https://github.com/ShrimpCatDev/CherryPop/blob/main/docs/manual.md")
     end)
     bar.timer=0
 end

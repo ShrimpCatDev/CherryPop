@@ -6,36 +6,26 @@ local active=false
 
 
 function codeEdit:init()
-
+    scroll={x=0,y=0}
+    selection={x=0,y=0,endX=0,endY=0,color=6}
+    selectionStart={x=0,y=0}
+    selectionEnd={x=0,y=0}
+    boot=false
 end
 
-function mysplit(inputstr, sep)
-    if sep == nil then
-      sep = "%s"
-    end
-    local t = {}
-    for str in string.gmatch(inputstr, "([^"..sep.."]*)") do
-      table.insert(t, str)
-    end
-    return t
-end
 local codeSelection={x=0,y=0,active=false}
 
 function codeEdit:enter()
     active=false
     blinkooldown=0
     blink=0
-    print("CODE:")
-    print(cart)
-    scroll={x=0,y=0}
+    --print("CODE:")
+    --print(cart)
+    
     mouse=require("editors/mouse") --define mouse
     bar.init()
-    --if codeInit then
-        codeLines={}--mysplit(cart, "\n")
-        --[[print("TABLE:")
-        for k,v in ipairs(codeLines) do
-            print(v)
-        end]]
+        codeLines={}
+
 
         local ind=1
         local newLine=0
@@ -55,9 +45,14 @@ function codeEdit:enter()
             codeLines[1]=""
         end
     --end
-    selection={x=0,y=0,endX=0,endY=0,color=6}
-    selectionStart={x=0,y=0}
-    selectionEnd={x=0,y=0}
+
+    if self.boot then
+        scroll={x=0,y=0}
+        selection={x=0,y=0,endX=0,endY=0,color=6}
+        selectionStart={x=0,y=0}
+        selectionEnd={x=0,y=0}
+        self.boot=false
+    end
 end
 
 function codeEdit:leave()

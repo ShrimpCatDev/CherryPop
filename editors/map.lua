@@ -1,6 +1,6 @@
 local map={}
 local activated=true
---0000000001111110010101100110101001010110011010100111111000000000
+
 function pixelSspr(sx,sy,sw,sh,x,y,tc)
     for y1=0,sh-1 do
         for x1=0,sw-1 do
@@ -26,12 +26,19 @@ local sel={x=0,y=0}
 local sheetOs=0
 local mode="draw"
 
+function map:init()
+    sel.x,sel.y=0,0
+    cam={x=0,y=0,osx=0,osy=0}
+    selectedTile=0
+    sheetOs=0
+    self.boot=false
+end
+
 function map:enter()
     mouse=require("editors/mouse")
     bar.init()
     activated=false
-    selectedTile=0
-    sheetOs=0
+    
     selOpen=false
     selCanvas=love.graphics.newCanvas(128,96-16)
     mode="draw"
@@ -55,8 +62,13 @@ function map:enter()
     buttons.new(24,96-8,8,8,"0000000001111000010010000100100001111100000011100000011000000000",3,13,function()
         mode="zoom"
     end)
-    sel.x,sel.y=0,0
-    cam={x=0,y=0,osx=0,osy=0}
+    if self.boot then
+        sel.x,sel.y=0,0
+        cam={x=0,y=0,osx=0,osy=0}
+        selectedTile=0
+        sheetOs=0
+        self.boot=false
+    end
 end
 
 function map:update()

@@ -159,6 +159,11 @@ function menu:update()
                 name=items[ind]
                 spriteUndo={}
                 boot=true
+
+                editor.sprite.boot=true
+                editor.code.boot=true
+                editor.map.boot=true
+
                 gs.switch(runCart)
             end
         end
@@ -225,9 +230,13 @@ function menu:keypressed(key)
             gs.switch(editor.code)
         end
         if key=="f" then
-            --love.system.setClipboardText(love.filesystem.getSaveDirectory( ))
-            love.system.openURL("file://"..love.filesystem.getSaveDirectory())
-            message="opened data directory!"
+            love.system.setClipboardText(love.filesystem.getSaveDirectory( ))
+            local suc= love.system.openURL("file://"..love.filesystem.getSaveDirectory())
+            if suc then
+                message="opened data directory!"
+            else
+                message="didn't open data directory"
+            end
         end
     else
         if key=="backspace" and string.len(fileName)>0 then
