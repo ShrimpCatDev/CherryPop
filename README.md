@@ -1,6 +1,8 @@
 # 🍒 CherryPop
 A WIP fantasy console made in Love2D!
 
+It features a 128x96 screen, 64 KiB of RAM, Lua scripting, a 128x128 spritesheet, and a 128x96 tilemap!
+
 # ℹ️ Getting started
 * first grab a build from the build folder for your system!
 * when you boot to the menu, press the up/down keys to select a cart, and press Z to select it.
