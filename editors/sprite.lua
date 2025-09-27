@@ -1,6 +1,33 @@
 local sprite={}
 
+local function undo()
+    if #sprite.undo > 0 then
+        local t={}
+        for i,j in ipairs(sprite.undo[#sprite.undo]) do
+            table.insert(t,{x=j.x,y=j.y,c=api.sget(j.x,j.y)})
+            print("added redo")
+            api.sset(j.x,j.y,j.c)
+            print("undid pixel at x: "..j.x.." y: "..j.y)
+        end
+        table.insert(sprite.redo,t)
+        table.remove(sprite.undo,#sprite.undo)
+        print(#sprite.redo)
+    end
+end
 
+local function redo()
+    if #sprite.redo > 0 then
+        local t={}
+        for i,j in ipairs(sprite.redo[#sprite.redo]) do
+            table.insert(t,{x=j.x,y=j.y,c=api.sget(j.x,j.y)})
+            print("added undo")
+            api.sset(j.x,j.y,j.c)
+            print("redid pixel at x: "..j.x.." y: "..j.y.." color:",j.c)
+        end
+        table.insert(sprite.undo,t)
+        table.remove(sprite.redo,#sprite.redo)
+    end
+end
 
 local function col(ax,ay,bx,by,aw,ah,bw,bh)
     return ax<bx+bw and bx<ax and ay<by+bh and by<ay
@@ -12,6 +39,7 @@ local sheetOs=0
 
 function sprite:init()
     sprite.undo={}
+    sprite.redo={}
     sel={x=0,y=0} --selection position
     Sclip={} --clipbboard
     sheetOs=0 --spritesheet selection offset
@@ -38,6 +66,7 @@ function sprite:enter()
         lso=0
         self.boot=false
         self.undo={}
+        self.redo={}
         color={0,2,lg.newImage("assets/selectedColor.png")} --color selection image (TODO: change to non-png drawable)
     end
 
@@ -187,7 +216,7 @@ function sprite:draw()
     mouse.draw()
 
     push:finish()
-    --lg.print("x: "..mouse.x.." y: "..mouse.y,0,0)
+    lg.print("x: "..mouse.x.." y: "..mouse.y,0,0)
     --lg.print(love.timer.getFPS(),0,20)
 end
 
@@ -205,14 +234,14 @@ function sprite:wheelmoved(x,y)
     end
 end
 
+
+
 function sprite:keypressed(k)
     if love.keyboard.isDown("lctrl") and k=="z" then
-        if #self.undo > 0 then
-            for i,j in ipairs(self.undo[#self.undo]) do
-                api.sset(j.x,j.y,j.c)
-            end
-            table.remove(self.undo,#self.undo)
-        end
+        undo()
+    end
+    if love.keyboard.isDown("lctrl") and k=="y" then
+        redo()
     end
     if love.keyboard.isDown("lctrl") and k=="c" then
         Sclip={}
@@ -223,28 +252,39 @@ function sprite:keypressed(k)
         end
     end
     if love.keyboard.isDown("lctrl") and k=="x" then
+        local t={}
         Sclip={}
         for y1=0,7 do
             for x1=0,7 do
                 table.insert(Sclip,api.sget(x1+sel.x*8,y1+sel.y*8))
+                table.insert(t,{x=x1+sel.x*8,y=y1+sel.y*8,c=api.sget(x1+sel.x*8,y1+sel.y*8)})
                 api.sset(x1+sel.x*8,y1+sel.y*8,0)
             end
         end
+        table.insert(self.undo,t)
     end
     if love.keyboard.isDown("lctrl") and k=="v" then
+        local t={}
         for x1=0,7 do
             for y1=0,7 do
+                table.insert(t,{x=x1+sel.x*8,y=y1+sel.y*8,c=api.sget(x1+sel.x*8,y1+sel.y*8)})
                 api.sset(x1+sel.x*8,y1+sel.y*8,Sclip[x1+(y1*8)+1])
             end
         end
+        table.insert(self.undo,t)
     end
     if k=="delete" then
 
+        local t={}
+
         for x1=0,7 do
             for y1=0,7 do
+                table.insert(t,{x=x1+sel.x*8,y=y1+sel.y*8,c=api.sget(x1+sel.x*8,y1+sel.y*8)})
                 api.sset(x1+sel.x*8,y1+sel.y*8,0)
             end
         end
+
+        table.insert(self.undo,t)
 
     end
 
