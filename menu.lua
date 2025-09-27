@@ -157,7 +157,6 @@ function menu:update()
                 mapSheet={}
                 load.readFile(items[ind])
                 name=items[ind]
-                spriteUndo={}
                 boot=true
 
                 editor.sprite.boot=true

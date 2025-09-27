@@ -11,6 +11,7 @@ local se=6 --scale of sprite editor
 local sheetOs=0
 
 function sprite:init()
+    sprite.undo={}
     sel={x=0,y=0} --selection position
     Sclip={} --clipbboard
     sheetOs=0 --spritesheet selection offset
@@ -36,6 +37,7 @@ function sprite:enter()
         sheetOs=0 --spritesheet selection offset
         lso=0
         self.boot=false
+        self.undo={}
         color={0,2,lg.newImage("assets/selectedColor.png")} --color selection image (TODO: change to non-png drawable)
     end
 
@@ -58,9 +60,11 @@ function sprite:update()
         if love.mouse.isDown(1) then
             --sprite editor
             if col(mouse.x,mouse.y,16,16,1,1,8*se,8*se) then
+                local x,y=math.floor((mouse.x-16)/se +sel.x*8),math.floor((mouse.y-17)/se +sel.y*8)
                 if self.mode=="draw" then
-                    if api.sget(math.floor((mouse.x-16)/se +sel.x*8),math.floor((mouse.y-16)/se +sel.y*8))~=color[1] then
-                        api.sset(math.floor((mouse.x-16)/se +sel.x*8),math.floor((mouse.y-16)/se +sel.y*8),color[1])
+                    if api.sget(x,y)~=color[1] then
+                        table.insert(self.undo,{{x=x,y=y,c=api.sget(x,y)}})
+                        api.sset(x,y,color[1])
                     end
                 else
 
@@ -194,14 +198,22 @@ function sprite:mousepressed(x,y,b)
 end
 
 function sprite:wheelmoved(x,y)
-        if y>0 and sheetOs>0 then
-            sheetOs=sheetOs-4
-        elseif y<0 and sheetOs<104 then
-            sheetOs=sheetOs+4
-        end
+    if y>0 and sheetOs>0 then
+        sheetOs=sheetOs-4
+    elseif y<0 and sheetOs<104 then
+        sheetOs=sheetOs+4
+    end
 end
 
 function sprite:keypressed(k)
+    if love.keyboard.isDown("lctrl") and k=="z" then
+        if #self.undo > 0 then
+            for i,j in ipairs(self.undo[#self.undo]) do
+                api.sset(j.x,j.y,j.c)
+            end
+            table.remove(self.undo,#self.undo)
+        end
+    end
     if love.keyboard.isDown("lctrl") and k=="c" then
         Sclip={}
         for y=0,7 do
