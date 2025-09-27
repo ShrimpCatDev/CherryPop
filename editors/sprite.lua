@@ -132,8 +132,10 @@ function sprite:draw()
     end
 
     --selection box
+    colr(0)
+    lg.rectangle("line",sel.x*8+0.5-2,sel.y*8+0.5-2-math.floor(lso),11,11)
     colr(13)
-    lg.rectangle("line",sel.x*8+1,sel.y*8+1-math.floor(lso),7,7)
+    lg.rectangle("line",sel.x*8+0.5-1,sel.y*8+0.5-1-math.floor(lso),9,9)
     for i=0,15 do
         colr((i%2)+1)
         lg.line(128,i*8-lso,128,i*8+8-lso)
