@@ -119,6 +119,9 @@ function sprite:enter()
     buttons.new(116,24,8,8,"0000000001111100010001000101111001011110011111100001111000000000",3,13,function()
         self.mode="rect"
     end)
+    buttons.new(116,32,8,8,"0000000000001000000001000111111001111110010111000100100000000000",3,13,function()
+        self.mode="fill"
+    end)
 
     local bos=78
     buttons.new(bos,57,8,8,"0000000000100000011111000010001000000010011111000000000000000000",3,12,function()
@@ -292,6 +295,11 @@ function sprite:mousepressed(x,y,b)
         self.rect.w=0
         self.rect.h=0
     end
+    if self.mode=="fill" and b==1 and col(mouse.x,mouse.y,16,16,1,1,8*se,8*se) then
+        local xx,yy=math.floor((mouse.x-16)/se +sel.x*8),math.floor((mouse.y-17)/se +sel.y*8)
+        
+    end
+
 end
 
 function sprite:mousereleased(x2,y2,b)
