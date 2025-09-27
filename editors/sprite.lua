@@ -268,6 +268,8 @@ function sprite:draw()
 
     colr(13)
     drawFont(tostring(color[1]),79,51)
+    --112,51
+    drawFont(self.mode,112-(string.len(self.mode)*font.w)+2,51)
     --113
     drawFont(tostring(sel.x+(sel.y*16)),123-((string.len(tostring(sel.x+(sel.y*16)))-1)*5),66)
 
@@ -279,7 +281,7 @@ function sprite:draw()
     push:finish()
     --lg.print("x: "..mouse.x.." y: "..mouse.y,0,0)
     --lg.print(love.timer.getFPS(),0,20)
-    lg.print(tostring(self.mode))
+    --lg.print(tostring(self.mode))
 end
 
 lso=0
@@ -360,6 +362,8 @@ function sprite:mousereleased(x2,y2,b)
             local q={{x=xx,y=yy}}
 
             local old=api.sget(xx,yy)
+
+            if old==color[1] then return end
 
             local t={}
             local w,h=8,8
