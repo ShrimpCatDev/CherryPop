@@ -29,6 +29,39 @@ local function redo()
     end
 end
 
+local function copy()
+    Sclip={}
+    for y=0,7 do
+        for x=0,7 do
+            table.insert(Sclip,api.sget(x+sel.x*8,y+sel.y*8))
+        end
+    end
+end
+
+local function paste()
+    local t={}
+    for x1=0,7 do
+        for y1=0,7 do
+            table.insert(t,{x=x1+sel.x*8,y=y1+sel.y*8,c=api.sget(x1+sel.x*8,y1+sel.y*8)})
+            api.sset(x1+sel.x*8,y1+sel.y*8,Sclip[x1+(y1*8)+1])
+        end
+    end
+    table.insert(sprite.undo,t)
+end
+
+local function delete()
+    local t={}
+
+    for x1=0,7 do
+        for y1=0,7 do
+            table.insert(t,{x=x1+sel.x*8,y=y1+sel.y*8,c=api.sget(x1+sel.x*8,y1+sel.y*8)})
+            api.sset(x1+sel.x*8,y1+sel.y*8,0)
+        end
+    end
+
+    table.insert(sprite.undo,t)
+end
+
 local function col(ax,ay,bx,by,aw,ah,bw,bh)
     return ax<bx+bw and bx<ax and ay<by+bh and by<ay
 end
@@ -77,6 +110,22 @@ function sprite:enter()
     --draw mode button
     buttons.new(116,16,8,8,"0000000000000100000011100001110000111000011100000110000000000000",3,13,function()
         self.mode="draw"
+    end)
+    local bos=78
+    buttons.new(bos,57,8,8,"0000000000100000011111000010001000000010011111000000000000000000",3,12,function()
+        undo()
+    end)
+    buttons.new(bos+8,57,8,8,"0000000000000100001111100100010001000000001111100000000000000000",3,5,function()
+        redo()
+    end)
+    buttons.new(bos+16,57,8,8,"0000000000011000011101000100101001000110010001100111110000000000",3,11,function()
+        copy()
+    end)
+    buttons.new(bos+24,57,8,8,"0000000000011000011111100101101001000010010000100111111000000000",3,13,function()
+        paste()
+    end)
+    buttons.new(bos+32,57,8,8,"0000000000011000011111100011110000111100001111000011110000000000",3,8,function()
+        delete()
     end)
 end
 
@@ -244,12 +293,7 @@ function sprite:keypressed(k)
         redo()
     end
     if love.keyboard.isDown("lctrl") and k=="c" then
-        Sclip={}
-        for y=0,7 do
-            for x=0,7 do
-                table.insert(Sclip,api.sget(x+sel.x*8,y+sel.y*8))
-            end
-        end
+        copy()
     end
     if love.keyboard.isDown("lctrl") and k=="x" then
         local t={}
@@ -264,28 +308,10 @@ function sprite:keypressed(k)
         table.insert(self.undo,t)
     end
     if love.keyboard.isDown("lctrl") and k=="v" then
-        local t={}
-        for x1=0,7 do
-            for y1=0,7 do
-                table.insert(t,{x=x1+sel.x*8,y=y1+sel.y*8,c=api.sget(x1+sel.x*8,y1+sel.y*8)})
-                api.sset(x1+sel.x*8,y1+sel.y*8,Sclip[x1+(y1*8)+1])
-            end
-        end
-        table.insert(self.undo,t)
+        paste()
     end
     if k=="delete" then
-
-        local t={}
-
-        for x1=0,7 do
-            for y1=0,7 do
-                table.insert(t,{x=x1+sel.x*8,y=y1+sel.y*8,c=api.sget(x1+sel.x*8,y1+sel.y*8)})
-                api.sset(x1+sel.x*8,y1+sel.y*8,0)
-            end
-        end
-
-        table.insert(self.undo,t)
-
+        delete()
     end
 
     bar.key(k)
