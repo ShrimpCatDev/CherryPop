@@ -29,7 +29,10 @@ end
 
 function love.load(arg)
     tick.framerate=60
+
     camera={x=0,y=0}
+    boot=false
+
     effect = moonshine(moonshine.effects.filmgrain)
                     .chain(moonshine.effects.vignette)
     effect.filmgrain.size = 2

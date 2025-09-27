@@ -51,6 +51,7 @@ function load.readFile(path)
             table.insert(loadSheet,0)
         end
     end
+
     if mapLoc then 
         local mapString=string.sub(contents,mapLoc+string.len(keyWordMap)+1,string.len(contents))
         if string.len(mapString)>((128*96)*2)-1 then
@@ -104,7 +105,7 @@ local message=""
 
 local function refreshFiles()
     items=getFileList()
-    love.filesystem.write("DONTREADME.txt", "this is a temporary file just ignore this")
+    --love.filesystem.write("DONTREADME.txt", "this is a temporary file just ignore this")
     table.insert(items,"new cart...")
 end
 
@@ -157,6 +158,7 @@ function menu:update()
                 load.readFile(items[ind])
                 name=items[ind]
                 spriteUndo={}
+                boot=true
                 gs.switch(runCart)
             end
         end

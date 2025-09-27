@@ -6,8 +6,6 @@ end
 
 local se=6 --scale of sprite editor
 
-
-
 function sprite:enter()
     mouse=require("editors/mouse") --define mouse
     if not mem.map and not cartLoaded then mem.init() end --fix missing memory if thats an issue
@@ -158,9 +156,6 @@ end
 lso=0
 
 function sprite:mousepressed(x,y,b)
-    --[[if b==1 then
-        buttons.pressed()
-    end]]
     bar.press(b)
 end
 
