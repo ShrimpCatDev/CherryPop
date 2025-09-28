@@ -22,7 +22,7 @@ function codeEdit:enter()
     --print("CODE:")
     --print(cart)
     
-    mouse=require("editors/mouse") --define mouse
+    mouse=require("editors.mouse") --define mouse
     bar.init()
         codeLines={}
 
@@ -84,7 +84,8 @@ function codeEdit:update()
 end
 
 function codeEdit:draw()
-    push:start()
+    shove.beginDraw()
+    shove.beginLayer("screen")
 
     love.graphics.setColor(palCol(0))
     lg.rectangle("fill",0,0,128,96)
@@ -121,7 +122,8 @@ function codeEdit:draw()
         bar.draw()
         mouse.draw()
         
-    push:finish()
+        shove.endLayer()
+        shove.endDraw()
     --lg.print(scroll.x,0,0)
     --lg.print("selection X: "..selection.x.." Y:"..selection.y,0,12)
 end

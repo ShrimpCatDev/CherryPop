@@ -35,7 +35,7 @@ function map:init()
 end
 
 function map:enter()
-    mouse=require("editors/mouse")
+    mouse=require("editors.mouse")
     bar.init()
     activated=false
     
@@ -124,7 +124,8 @@ function map:draw()
 
     lg.setCanvas()
     
-    push:start()
+    shove.beginDraw()
+    shove.beginLayer("screen")
         
         local cx,cy=-math.floor(cam.x/8),-math.floor(cam.y/8)
         for y=0,11 do
@@ -138,7 +139,7 @@ function map:draw()
 
         colr(2)
         lg.rectangle("fill",0,96-8,128,8)
-        
+
         if not love.mouse.isDown(1) then
             colr(13)
             drawFont(selectedTile,1,9)
@@ -161,7 +162,8 @@ function map:draw()
         bar.draw()
         
         mouse.draw()
-    push:finish()
+        shove.endLayer()
+        shove.endDraw()
     --lg.print(mouse.x.." "..mouse.y)
     --lg.print(tostring(activated),0,12)
     --lg.print(sheetOs)

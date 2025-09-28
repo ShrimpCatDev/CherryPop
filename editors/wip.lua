@@ -6,7 +6,7 @@ function wip:init()
 end
 
 function wip:enter()
-    mouse=require("editors/mouse") --define mouse
+    mouse=require("editors.mouse") --define mouse
     bar.init()
     t=0
 end
@@ -18,7 +18,8 @@ function wip:update()
 end
 
 function wip:draw()
-    push:start()
+    shove.beginDraw()
+    shove.beginLayer("screen")
         --[[love.graphics.setColor(palCol(2))
         lg.rectangle("fill",0,0,128,96)]]
 
@@ -33,7 +34,8 @@ function wip:draw()
         bar.draw()
         mouse.draw()
         
-    push:finish()
+        shove.endLayer()
+        shove.endDraw()
 end
 
 function wip:mousepressed(x,y,b)

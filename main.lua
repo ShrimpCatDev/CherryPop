@@ -1,22 +1,26 @@
-tick=require 'lib/tick'
+tick=require 'lib.tick'
 
 love.graphics.setDefaultFilter("nearest","nearest")
-moonshine=require('lib/moonshine')
-push=require("lib/push")
-push:setupScreen(128,96,128*5,96*5,{resizable=true,pixelperfect=true})
+
+--push=require("lib/push")
+--push:setupScreen(128,96,128*5,96*5,{resizable=true,pixelperfect=true})
+
+shove=require("lib.shove")
+shove.setResolution(128,96,{fitMethod="pixel",renderMode="layer"})
+shove.setWindowMode(800,600,{resizable=true})
 
 
 require("func")
 local api=require("api")
 paused=false
 t=0
-gs=require "lib/gamestate"
+gs=require "lib.gamestate"
 
 cart=[[
 
 ]]
 
-console = require "lib/console"
+console = require "lib.console"
 
 function colr(c)
     love.graphics.setColor(palCol(c))
@@ -28,14 +32,13 @@ end
 
 
 function love.load(arg)
+    love.keyboard.setTextInput(true)
+    shove.createLayer("screen")
     tick.framerate=60
 
     camera={x=0,y=0}
     boot=false
 
-    effect = moonshine(moonshine.effects.filmgrain)
-                    .chain(moonshine.effects.vignette)
-    effect.filmgrain.size = 2
     initFont("assets/font.png",[===[abcdefghijklmnopqrstuvwxyz !CF0123456789.:(){}-+/*,="'_[]RBSH?<>@#$%^&A]===],5,6)
     spriteUndo={}
 
@@ -45,7 +48,7 @@ function love.load(arg)
     love.keyboard.setKeyRepeat(true)
     memCode=[[]]
     buttons=require("buttons")
-    bar=require("editors/bar")
+    bar=require("editors.bar")
     loadSheet={}
     mapSheet={}
     lg.setLineStyle("rough")
@@ -65,11 +68,11 @@ function love.load(arg)
     menuProg=require("menu")
 
     editor={}
-    editor.sprite=require("editors/sprite")
-    editor.code=require("editors/code")
-    editor.map=require("editors/map")
-    editor.wip=require("editors/wip")
-    editor.error=require("editors/error")
+    editor.sprite=require("editors.sprite")
+    editor.code=require("editors.code")
+    editor.map=require("editors.map")
+    editor.wip=require("editors.wip")
+    editor.error=require("editors.error")
 
     love.mouse.setVisible(false)
     loadSheet={}
@@ -107,13 +110,13 @@ end
 
 fullscreen=false
 function love.keypressed(k)
-    if k=="f11" then
+    --[[if k=="f11" then
         push:switchFullscreen()
-    end
+    end]]
 end
 
 function love.resize(w, h)
-    return push:resize(w, h)
+    --return push:resize(w, h)
 end
 
 function drawBinary(txt,xx,yy,clr)

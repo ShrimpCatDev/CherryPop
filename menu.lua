@@ -113,7 +113,7 @@ function menu:enter()
 
     makingFile=false
     fileName=""
-    local isFile = love.filesystem.getInfo("textdemo.chp")
+    --local isFile = love.filesystem.getInfo("textdemo.chp")
     --[[if not isFile then
         love.filesystem.write("textdemo.chp", demo)
     end]]
@@ -170,7 +170,8 @@ function menu:update()
 end
 
 function menu:draw()
-    push:start()
+    shove.beginDraw()
+    shove.beginLayer("screen")
     --[[for y=0,95 do
         for x=0,127 do
             colr((math.floor((x+y+(love.timer.getTime()*25))/4)%2)+1)
@@ -204,7 +205,8 @@ function menu:draw()
     --drawChar("a",0,0)
     --lg.print(tostring(string.find(font.text,"a")))
     --lg.print(font.text)
-    push:finish()
+    shove.endLayer()
+    shove.endDraw()
 end
 
 function menu:textinput(k)

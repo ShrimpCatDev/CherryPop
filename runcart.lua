@@ -80,7 +80,8 @@ function runCart:update()
 end
 
 function runCart:draw()
-    push:start()  
+    shove.beginDraw()
+    shove.beginLayer("screen")
     
     sb.tickCart()
     
@@ -110,7 +111,8 @@ function runCart:draw()
         end
     end
     
-    push:finish()
+    shove.endLayer()
+    shove.endDraw()
     --lg.print(love.timer.getFPS())
     --lg.print(tick.frame)
 end

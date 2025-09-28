@@ -1,5 +1,5 @@
 api={}
-baton=require "lib/baton"
+baton=require "lib.baton"
 
 
 

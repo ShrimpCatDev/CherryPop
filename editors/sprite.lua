@@ -89,7 +89,7 @@ function sprite:enter()
 
     self.mode="draw"
 
-    mouse=require("editors/mouse") --define mouse
+    mouse=require("editors.mouse") --define mouse
     if not mem.map and not cartLoaded then mem.init() end --fix missing memory if thats an issue
     
     Sundo={} --undo variable (TODO)
@@ -195,6 +195,8 @@ end
 
 function sprite:draw()
 
+    lg.setColor(1,1,1)
+
     love.graphics.setCanvas(sprImg)
         love.graphics.setColor(palCol(0))
         lg.rectangle("fill",0,0,8,8)
@@ -236,7 +238,8 @@ function sprite:draw()
     end
     love.graphics.setCanvas()
     
-    push:start()
+    shove.beginDraw()
+    shove.beginLayer("screen")
 
     --draw bg
     love.graphics.setColor(palCol(2))
@@ -278,7 +281,11 @@ function sprite:draw()
      --draw the mouse
     mouse.draw()
 
-    push:finish()
+    lg.setColor(1,1,1)
+
+    shove.endLayer()
+    lg.setColor(1,1,1)
+    shove.endDraw()
     --lg.print("x: "..mouse.x.." y: "..mouse.y,0,0)
     --lg.print(love.timer.getFPS(),0,20)
     --lg.print(tostring(self.mode))
