@@ -336,7 +336,7 @@ function sprite:mousereleased(x2,y2,b)
             local xx,yy=self.rect.x,self.rect.y
 
             if love.keyboard.isDown("lshift") then
-               for x1=self.rect.x,x,dx do
+               for x1=self.rect.x+dx,x-dx,dx do
                    table.insert(t,{x=x1,y=yy,c=api.sget(x1,yy)})
                     table.insert(t,{x=x1,y=y,c=api.sget(x1,y)})
                     api.sset(x1,yy,color[1])
@@ -344,10 +344,11 @@ function sprite:mousereleased(x2,y2,b)
                 end
                 for y1=self.rect.y,y,dy do
                     table.insert(t,{x=xx,y=y1,c=api.sget(xx,y1)})
-                    table.insert(t,{x=x,y=y,c=api.sget(x,y1)})
+                    table.insert(t,{x=x,y=y1,c=api.sget(x,y1)})
                     api.sset(xx,y1,color[1])
                     api.sset(x,y1,color[1])
                 end
+                
             else
                 for x1=self.rect.x,x,dx do
                     for y1=self.rect.y,y,dy do

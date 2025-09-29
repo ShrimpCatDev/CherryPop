@@ -353,27 +353,29 @@ function map:mousereleased(x,y,b)
 
             local xx,yy=self.rect.x,self.rect.y
 
-            --[[if love.keyboard.isDown("lshift") then
-               for x1=self.rect.x,x,dx do
-                   table.insert(t,{x=x1,y=yy,c=api.sget(x1,yy)})
-                    table.insert(t,{x=x1,y=y,c=api.sget(x1,y)})
-                    api.sset(x1,yy,color[1])
-                    api.sset(x1,y,color[1])
+            if love.keyboard.isDown("lshift") then
+                for x1=self.rect.x+dx,x-dx,dx do
+                    table.insert(t,{x=x1,y=y,c=api.mget(x1,y)})
+                    table.insert(t,{x=x1,y=self.rect.y,c=api.mget(x1,self.rect.y)})
+                    
+                    api.mset(x1,y,selectedTile)
+                    api.mset(x1,self.rect.y,selectedTile)
                 end
                 for y1=self.rect.y,y,dy do
-                    table.insert(t,{x=xx,y=y1,c=api.sget(xx,y1)})
-                    table.insert(t,{x=x,y=y,c=api.sget(x,y1)})
-                    api.sset(xx,y1,color[1])
-                    api.sset(x,y1,color[1])
+                    table.insert(t,{x=self.rect.x,y=y1,c=api.mget(self.rect.x,y1)})
+                    table.insert(t,{x=x,y=y1,c=api.mget(x,y1)})
+                    
+                    api.mset(x,y1,selectedTile)
+                    api.mset(self.rect.x,y1,selectedTile)
                 end
-            else]]
+            else
                 for x1=self.rect.x,x,dx do
                     for y1=self.rect.y,y,dy do
                         table.insert(t,{x=x1,y=y1,c=api.mget(x1,y1)})
                         api.mset(x1,y1,selectedTile)
                     end
                 end
-            --end
+            end
 
             table.insert(self.undo,t)
 
