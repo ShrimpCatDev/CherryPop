@@ -1,8 +1,15 @@
 local map={}
 local activated=true
 
+local cam={x=0,y=0,osx=0,osy=0}
+local selectedTile=0
+local sel={x=0,y=0}
+local sheetOs=0
+local mode="draw"
+
 local function undo()
     if #map.undo > 0 then
+
         local t={}
         for i,j in ipairs(map.undo[#map.undo]) do
             table.insert(t,{x=j.x,y=j.y,c=api.mget(j.x,j.y)})
@@ -12,6 +19,57 @@ local function undo()
         table.insert(map.redo,t)
         table.remove(map.undo,#map.undo)
         print(#map.redo)
+        
+    end
+    if #map.undo>24 then
+        table.remove(map.undo,1)
+    end
+end
+
+local function fill()
+    if not selOpen and mode=="fill" then
+    local dir={
+        {x=1,y=0},
+        {x=-1,y=0},
+        {x=0,y=1},
+        {x=0,y=-1}
+    }
+
+    local cx,cy=-math.floor(cam.x/8),-math.floor(cam.y/8)
+    local mx,my=math.floor(mouse.x/8),math.floor(mouse.y/8)
+
+    local xx,yy=mx+cx,my+cy
+
+    local q={{x=xx,y=yy}}
+
+    local old=api.mget(xx,yy)
+
+    if old==selectedTile then return end
+
+    local t={}
+    local w,h=16,12
+
+    for x=cx,cx+w do
+        for y=cy,cy+h do
+            table.insert(t,{x=x,y=y,c=api.mget(x,y)})
+        end
+    end
+
+    while #q>0 do
+        local p=table.remove(q)
+                
+        api.mset(p.x,p.y,selectedTile)
+
+
+        for k,v in pairs(dir) do
+            if api.mget(p.x+v.x,p.y+v.y)==old and p.x+v.x>=cx and p.x+v.x<cx+16 and p.y+v.y>=cy and p.y+v.y<cy+12 then
+                table.insert(q,{x=p.x+v.x,y=p.y+v.y})
+            end
+        end
+                
+    end
+
+    table.insert(map.undo,t)
     end
 end
 
@@ -24,7 +82,11 @@ local function redo()
         end
         table.insert(map.undo,t)
         table.remove(map.redo,#map.redo)
+        
     end
+    if #map.redo>24 then
+            table.remove(map.redo,1)
+        end
 end
 
 function pixelSspr(sx,sy,sw,sh,x,y,tc)
@@ -46,11 +108,7 @@ function pixelSpr(index,x,y,tc,w,h)
     pixelSspr(sx,sy,ww*8,hh*8,x,y,tc)
 end
 
-local cam={x=0,y=0,osx=0,osy=0}
-local selectedTile=0
-local sel={x=0,y=0}
-local sheetOs=0
-local mode="draw"
+
 
 local function delete()
     local cx,cy=math.floor(cam.x/8),math.floor(cam.y/8)
@@ -104,8 +162,11 @@ function map:enter()
     buttons.new(16,96-8,8,8,"0000000001111100010001000101111001011110011111100001111000000000",3,13,function()
         mode="rect"
     end)
+    buttons.new(24,96-8,8,8,"0000000000001000000001000111111001111110010111000100100000000000",3,13,function()
+        mode="fill"
+    end)
     --zoom button
-    buttons.new(24,96-8,8,8,"0000000001111000010010000100100001111100000011100000011000000000",3,13,function()
+    buttons.new(32,96-8,8,8,"0000000001111000010010000100100001111100000011100000011000000000",3,13,function()
         mode="zoom"
     end)
     if self.boot then
@@ -118,6 +179,7 @@ function map:enter()
         self.redo={}
         mode= "draw"
     end
+    self.rect={}
 end
 
 function map:update()
@@ -201,6 +263,9 @@ function map:draw()
         colr(13)
         drawFont(string,123-((string.len(string)-1)*5),96-7)
 
+        colr(13)
+        drawFont(mode,1,96-8-7)
+
         lg.push()
         if selOpen then
             
@@ -212,9 +277,12 @@ function map:draw()
         bar.draw()
         
         mouse.draw()
+        lg.setColor(1,1,1,1)
         shove.endLayer()
+        lg.setColor(1,1,1,1)
         shove.endDraw()
-    --lg.print(mouse.x.." "..mouse.y)
+        local cx,cy=-math.floor(cam.x/8),-math.floor(cam.y/8)
+    lg.print(cx..", "..cy)
     --lg.print(tostring(activated),0,12)
     --lg.print(sheetOs)
 end
@@ -237,18 +305,96 @@ function map:mousepressed(x,y,b)
         cam.osy=cam.y-mouse.y
         activated=true
     end
+
+    if b==1 and not selOpen then
+        if mode=="rect" and mouse.y>=8 and mouse.y<96-8 then
+            local cx,cy=math.floor(cam.x/8),math.floor(cam.y/8)
+            local mx,my=math.floor(mouse.x/8),math.floor(mouse.y/8)
+
+            local xx,yy=mx-cx,my-cy
+
+            print("init rect at x: "..xx.." y: "..yy)
+
+            self.rect.down=true
+            local x,y=xx,yy
+            self.rect.x=x
+            self.rect.y=y
+            self.rect.w=0
+            self.rect.h=0
+        end
+    end
 end
 
 function map:mousereleased(x,y,b)
+
+    if b==1 and not selOpen then
+        if mode=="rect" and mouse.y>=8 and mouse.y<96-8 then
+            if self.rect.down then
+            local cx,cy=math.floor(cam.x/8),math.floor(cam.y/8)
+            local mx,my=math.floor(mouse.x/8),math.floor(mouse.y/8)
+
+            local x,y=mx-cx,my-cy
+            print("end rect at x: "..x.." y: "..y)
+            --api.sset(x,y,color[1])
+            --api.sset(self.rect.x,self.rect.y,color[1])
+            local t={}
+            local dx,dy=1,1
+
+            if x>= self.rect.x then
+                dx=1
+            else
+                dx=-1
+            end
+            if y>= self.rect.y then
+                dy=1
+            else
+                dy=-1
+            end
+
+            local xx,yy=self.rect.x,self.rect.y
+
+            --[[if love.keyboard.isDown("lshift") then
+               for x1=self.rect.x,x,dx do
+                   table.insert(t,{x=x1,y=yy,c=api.sget(x1,yy)})
+                    table.insert(t,{x=x1,y=y,c=api.sget(x1,y)})
+                    api.sset(x1,yy,color[1])
+                    api.sset(x1,y,color[1])
+                end
+                for y1=self.rect.y,y,dy do
+                    table.insert(t,{x=xx,y=y1,c=api.sget(xx,y1)})
+                    table.insert(t,{x=x,y=y,c=api.sget(x,y1)})
+                    api.sset(xx,y1,color[1])
+                    api.sset(x,y1,color[1])
+                end
+            else]]
+                for x1=self.rect.x,x,dx do
+                    for y1=self.rect.y,y,dy do
+                        table.insert(t,{x=x1,y=y1,c=api.mget(x1,y1)})
+                        api.mset(x1,y1,selectedTile)
+                    end
+                end
+            --end
+
+            table.insert(self.undo,t)
+
+            self.rect.down=false
+            end
+        end
+    end
+    
     if b==3 and not selOpen then
         cam.osx,cam.osy=0,0
         activated=false
+    end
+    if b==1 and mouse.y>=8 and mouse.y<96-8 then
+        fill()
     end
     if b==1 and selOpen then
         if mouse.y>=8 and mouse.y<96-8 then
             selOpen=false
         end
     end
+    
 end
 
 function map:keypressed(k)

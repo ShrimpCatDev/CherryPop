@@ -13,6 +13,9 @@ local function undo()
         table.remove(sprite.undo,#sprite.undo)
         print(#sprite.redo)
     end
+    if #sprite.undo>64 then
+        table.remove(sprite.undo,1)
+    end
 end
 
 local function redo()
@@ -26,6 +29,9 @@ local function redo()
         end
         table.insert(sprite.undo,t)
         table.remove(sprite.redo,#sprite.redo)
+    end
+    if #sprite.redo>64 then
+        table.remove(sprite.redo,1)
     end
 end
 
