@@ -7,7 +7,7 @@ love.graphics.setDefaultFilter("nearest","nearest")
 
 shove=require("lib.shove")
 shove.setResolution(128,96,{fitMethod="pixel",renderMode="layer"})
-shove.setWindowMode(800,600,{resizable=true})
+shove.setWindowMode(128*6,96*6,{resizable=true})
 
 
 require("func")

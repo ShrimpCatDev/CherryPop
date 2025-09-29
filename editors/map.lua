@@ -1,6 +1,32 @@
 local map={}
 local activated=true
 
+local function undo()
+    if #map.undo > 0 then
+        local t={}
+        for i,j in ipairs(map.undo[#map.undo]) do
+            table.insert(t,{x=j.x,y=j.y,c=api.mget(j.x,j.y)})
+            api.mset(j.x,j.y,j.c)
+            print("undid tile at x: "..j.x.." y: "..j.y)
+        end
+        table.insert(map.redo,t)
+        table.remove(map.undo,#map.undo)
+        print(#map.redo)
+    end
+end
+
+local function redo()
+    if #map.redo > 0 then
+        local t={}
+        for i,j in ipairs(map.redo[#map.redo]) do
+            table.insert(t,{x=j.x,y=j.y,c=api.mget(j.x,j.y)})
+            api.mset(j.x,j.y,j.c)
+        end
+        table.insert(map.undo,t)
+        table.remove(map.redo,#map.redo)
+    end
+end
+
 function pixelSspr(sx,sy,sw,sh,x,y,tc)
     for y1=0,sh-1 do
         for x1=0,sw-1 do
@@ -26,12 +52,32 @@ local sel={x=0,y=0}
 local sheetOs=0
 local mode="draw"
 
+local function delete()
+    local cx,cy=math.floor(cam.x/8),math.floor(cam.y/8)
+    local mx,my=math.floor(mouse.x/8),math.floor(mouse.y/8)
+
+    local t={}
+        
+    for x=0,15 do
+        for y=0,11 do
+            table.insert(t,{x=x-cx,y=y-cy,c=api.mget(x-cx,y-cy)})
+            api.mset(x-cx,y-cy,0)
+            print("deleted tile at x: "..x-cx.."y: "..y-cy)
+        end
+    end
+
+    table.insert(map.undo,t)
+end
+
 function map:init()
+    mode= "draw"
     sel.x,sel.y=0,0
     cam={x=0,y=0,osx=0,osy=0}
     selectedTile=0
     sheetOs=0
     self.boot=false
+    self.undo={}
+    self.redo={}
 end
 
 function map:enter()
@@ -68,6 +114,9 @@ function map:enter()
         selectedTile=0
         sheetOs=0
         self.boot=false
+        self.undo={}
+        self.redo={}
+        mode= "draw"
     end
 end
 
@@ -92,7 +141,8 @@ function map:update()
         local cx,cy=math.floor(cam.x/8),math.floor(cam.y/8)
         local mx,my=math.floor(mouse.x/8),math.floor(mouse.y/8)
         if love.mouse.isDown(1) and mouse.y>=8 and mouse.y<96-8 then
-            if mode=="draw" then
+            if mode=="draw" and api.mget(mx-cx,my-cy)~=selectedTile then
+                table.insert(self.undo,{{x=mx-cx,y=my-cy,c=api.mget(mx-cx,my-cy)}})
                 api.mset(mx-cx,my-cy,selectedTile)
             end
         end
@@ -203,14 +253,17 @@ end
 
 function map:keypressed(k)
     bar.key(k)
+    if k=="space" then 
+        selOpen=true
+    end
     if k=="delete" then
-        local cx,cy=math.floor(cam.x/8),math.floor(cam.y/8)
-        local mx,my=math.floor(mouse.x/8),math.floor(mouse.y/8)
-        for x=0,15 do
-            for y=0,11 do
-                api.mset(x-cx,y-cy,0)
-            end
-        end
+        delete()
+    end
+    if love.keyboard.isDown("lctrl") and k=="z" then
+        undo()
+    end
+    if love.keyboard.isDown("lctrl") and k=="y" then
+        redo()
     end
 end
 
