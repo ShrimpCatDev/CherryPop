@@ -62,7 +62,7 @@ local function fill()
 
 
         for k,v in pairs(dir) do
-            if api.mget(p.x+v.x,p.y+v.y)==old and p.x+v.x>=cx and p.x+v.x<cx+16 and p.y+v.y>=cy and p.y+v.y<cy+12 then
+            if api.mget(p.x+v.x,p.y+v.y)==old and p.x+v.x>=cx and p.x+v.x<cx+16 and p.y+v.y>=cy and p.y+v.y<cy+12 and p.x+v.x>=0 and p.x+v.x<128 and p.y+v.y>=0 and p.y+v.y<96 then
                 table.insert(q,{x=p.x+v.x,y=p.y+v.y})
             end
         end
