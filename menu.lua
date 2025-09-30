@@ -20,12 +20,11 @@ end
     cart=contents
 end]]
 
-local keyWordSprite="#SPRITE"
-local keyWordCode="#CODE"
-local keyWordMap="#MAP"
+keyWordSprite="#SPRITE"
+keyWordCode="#CODE"
+keyWordMap="#MAP"
 
-function load.readFile(path)
-    local contents = love.filesystem.read(path..".chp")
+function readFile(contents)
     local codeLoc=string.find(contents,keyWordCode)
     local spriteLoc=string.find(contents,keyWordSprite)
     local mapLoc=string.find(contents,keyWordMap)
@@ -68,13 +67,7 @@ function load.readFile(path)
     end
 end
 
-local templateCart=[[
-#CART
-
-#SPRITE
-
-#MAP
-]]
+local templateCart=keyWordCode.."\n\n\n"..keyWordSprite.."\n\n\n"..keyWordMap.."\n\n\n"
 
 function load.readCode(path)
     local contents = love.filesystem.read(path..".chp")
@@ -163,7 +156,7 @@ function menu:update()
             else
                 loadSheet={}
                 mapSheet={}
-                load.readFile(items[ind])
+                readFile(love.filesystem.read(items[ind]..".chp"))
                 name=items[ind]
                 boot=true
 

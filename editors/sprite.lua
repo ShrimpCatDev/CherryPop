@@ -70,6 +70,56 @@ local function delete()
     table.insert(sprite.undo,t)
 end
 
+--0000000000010000010101000101010011010110110101101101011000000000
+
+local function vflip()
+    local t={}
+
+    local f={}
+
+    for x1=0,7 do
+        for y1=0,7 do
+            local flipy=math.abs((7-y1)+sel.y*8)
+            --api.sset(x1+sel.x*8,y1+sel.y*8,api.sget(flipx,y1+sel.y*8))
+            table.insert(t,{x=x1+sel.x*8,y=y1+sel.y*8,c=api.sget(x1+sel.x*8,y1+sel.y*8)})
+            table.insert(f,{x=x1+sel.x*8,y=y1+sel.y*8,c=api.sget(x1+sel.x*8,flipy)})
+            --print(fx)
+        end
+    end
+
+    for k,v in ipairs(f) do
+        api.sset(v.x,v.y,v.c)
+    end
+
+    f=nil
+
+    table.insert(sprite.undo,t)
+end
+
+local function hflip()
+    local t={}
+
+    local f={}
+
+    for x1=0,7 do
+        for y1=0,7 do
+            local flipx=math.abs((7-x1)+sel.x*8)
+            --api.sset(x1+sel.x*8,y1+sel.y*8,api.sget(flipx,y1+sel.y*8))
+            table.insert(t,{x=x1+sel.x*8,y=y1+sel.y*8,c=api.sget(x1+sel.x*8,y1+sel.y*8)})
+            table.insert(f,{x=x1+sel.x*8,y=y1+sel.y*8,c=api.sget(flipx,y1+sel.y*8)})
+            --print(fx)
+        end
+    end
+
+    for k,v in ipairs(f) do
+        api.sset(v.x,v.y,v.c)
+    end
+
+    f=nil
+
+    table.insert(sprite.undo,t)
+end
+
 local function col(ax,ay,bx,by,aw,ah,bw,bh)
     return ax<bx+bw and bx<ax and ay<by+bh and by<ay
 end
@@ -127,6 +177,12 @@ function sprite:enter()
     end)
     buttons.new(116,32,8,8,"0000000000001000000001000111111001111110010111000100100000000000",3,13,function()
         self.mode="fill"
+    end)
+    buttons.new(116,32+8,8,8,"0000000001111000011111100000000001111110000000000111111001111000",3,13,function()
+        vflip()
+    end)
+    buttons.new(116,32+16,8,8,"0000000000010000010101000101010011010110110101101101011000000000",3,13,function()
+        hflip()
     end)
 
     local bos=78
@@ -421,6 +477,12 @@ function sprite:wheelmoved(x,y)
 end
 
 function sprite:keypressed(k)
+    if k=="f" then
+        hflip()
+    end
+    if k=="v" then
+        vflip()
+    end
     if love.keyboard.isDown("lctrl") and k=="z" then
         undo()
     end

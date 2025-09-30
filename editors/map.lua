@@ -290,8 +290,10 @@ function map:draw()
         local cx,cy=math.floor(cam.x/8),math.floor(cam.y/8)
         local mx,my=math.floor(mouse.x/8),math.floor(mouse.y/8)
         local string=mx-cx..","..my-cy
-        colr(13)
-        drawFont(string,123-((string.len(string)-1)*5),96-7)
+        if not zoomOpen then
+            colr(13)
+            drawFont(string,123-((string.len(string)-1)*5),96-7)
+        end
 
         colr(13)
         drawFont(mode,1,96-8-7)
@@ -360,7 +362,7 @@ end
 
 function map:mousereleased(x,y,b)
 
-    if b==1 and not selOpen then
+    if b==1 and not selOpen and not zoomOpen then
         if mode=="rect" and mouse.y>=8 and mouse.y<96-8 then
             if self.rect.down then
             local cx,cy=math.floor(cam.x/8),math.floor(cam.y/8)
@@ -417,11 +419,11 @@ function map:mousereleased(x,y,b)
         end
     end
     
-    if b==3 and not selOpen then
+    if b==3 and not selOpen and not zoomOpen then
         cam.osx,cam.osy=0,0
         activated=false
     end
-    if b==1 and mouse.y>=8 and mouse.y<96-8 then
+    if b==1 and mouse.y>=8 and mouse.y<96-8 and not zoomOpen then
         fill()
     end
     if b==1 and selOpen then
