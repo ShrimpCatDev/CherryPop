@@ -34,6 +34,10 @@ keyWordSprite="#SPRITE"
 keyWordCode="#CODE"
 keyWordMap="#MAP"
 
+function love.conf(t)
+    t.window.highdpi=false
+end
+
 function readFile(contents)
     local codeLoc=string.find(contents,keyWordCode)
     local spriteLoc=string.find(contents,keyWordSprite)
