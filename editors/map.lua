@@ -149,7 +149,11 @@ function map:enter()
     zoomCanvas=love.graphics.newCanvas(128,96-16)
     mode="draw"
     buttons.new(0,96-8,8,8,"0000000001111110010101100110101001010110011010100111111000000000",3,13,function()
-        selOpen=true
+        if selOpen then
+            selOpen=false
+        else
+            selOpen=true
+        end
         zoomOpen=false
     end)
     --draw mode button
@@ -224,13 +228,13 @@ function map:update()
         end
         selectedTile=sel.x+(sel.y*16)
     else
-        if mouse.y>=8 and mouse.y<96-8 and col(map.zoom.osx,map.zoom.osy,mouse.x,mouse.y,64,96/2,1,1) then
-            cam.x,cam.y=mouse.x-map.zoom.osx,mouse.y-map.zoom.osy
+        if mouse.y>=8 and mouse.y<96-8 then
+            cam.x,cam.y=-(mouse.x-map.zoom.osx)*(128/16)*2,-(mouse.y-map.zoom.osy)*(96/12)*2
         end
     end
 end
 
-map.zoom={osx=64-32,osy=96/2-(96/4)-8,div=2}
+map.zoom={osx=64-32,osy=96/2-(96/4),div=2}
 
 function map:draw()
     lg.setColor(1,1,1)
@@ -246,18 +250,20 @@ function map:draw()
     lg.setCanvas()
 
     lg.setCanvas(zoomCanvas)
+        colr(0)
+        lg.rectangle("fill",0,0,128,96)
         colr(1)
         divX=128/16
         divY=96/12
         for x=0,divX-1 do
             for y=0,divY-1 do
-                lg.rectangle("line",x*(64/divX)+map.zoom.osx+0.5,y*(96/2/divY)+map.zoom.osy+0.5,64/divX,96/2/divY)
+                lg.rectangle("line",x*(64/divX)+map.zoom.osx+0.5,y*(96/2/divY)+map.zoom.osy-8+0.5,64/divX,96/2/divY)
             end
         end
         colr(13)
-        if col(map.zoom.osx,map.zoom.osy,mouse.x,mouse.y,64,96/2,1,1) then
-            lg.rectangle("line",mouse.x+0.5,mouse.y+0.5,64/divX,96/2/divY)
-        end
+        --if col(map.zoom.osx,map.zoom.osy+8,mouse.x,mouse.y,64,96/2,1,1) then
+            lg.rectangle("line",mouse.x+0.5,mouse.y-8+0.5,64/divX,96/2/divY)
+        --end
     lg.setCanvas()
     
     shove.beginDraw()
@@ -302,13 +308,14 @@ function map:draw()
         lg.pop()
         bar.draw()
         
-        mouse.draw()
+        if not zoomOpen then mouse.draw() end
         lg.setColor(1,1,1,1)
         shove.endLayer()
         lg.setColor(1,1,1,1)
         shove.endDraw()
         local cx,cy=-math.floor(cam.x/8),-math.floor(cam.y/8)
-    lg.print(cx..", "..cy)
+    --lg.print(mouse.x..", "..mouse.y)
+    --lg.print(map.zoom.osx..", "..map.zoom.osy+8,0,16)
     --lg.print(tostring(activated),0,12)
     --lg.print(sheetOs)
 end
