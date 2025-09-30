@@ -215,7 +215,7 @@ function codeEdit:keypressed(k)
     end
     if k=="return" then
         local text=string.sub(codeLines[selection.y+1],selection.x+1,#codeLines[selection.y+1])
-        print(text)
+        --print(text)
         codeLines[selection.y+1]=string.sub(codeLines[selection.y+1],1,selection.x)
         table.insert(codeLines,selection.y+2,text)
         selection.y=selection.y+1
@@ -304,8 +304,8 @@ function codeEdit:textinput(k)
     blinkooldown=30
     codeLines[selection.y+1]=insertCharAt(codeLines[selection.y+1],selection.x,k)
     selection.x=selection.x+1
-    print(k)
-    print(codeLines[selection.y+1])
+    --print(k)
+    --print(codeLines[selection.y+1])
 end
 
 return codeEdit

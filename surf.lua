@@ -3,15 +3,30 @@ local items={}
 local ind=1
 load={}
 
+https=require("https")
+
 local function getFileList()
     local names = {}
-    local files = love.filesystem.getDirectoryItems("")
-    for k,file in ipairs(files) do
-        local name = file:match("^(.+)%.chp$")
-        if name then
-            table.insert(names,tostring(name))
+    err,body=https.request("https://raw.githubusercontent.com/ShrimpCatDev/cherrypop-db/refs/heads/main/db")
+    
+    print(err)
+    print(body)
+    local ind=1
+    local newLine=0
+
+    while ind <= string.len(body) do
+        local curr=string.sub(body,ind,ind)
+
+        newLine=newLine+1
+        table.insert(names,"")
+        while string.sub(body,ind,ind)~="\n" do
+            names[#names]=names[#names]..string.sub(body,ind,ind)
+            ind=ind+1
         end
+
+        ind=ind+1
     end
+
     return names
 end
 
@@ -25,7 +40,8 @@ local keyWordCode="#CODE"
 local keyWordMap="#MAP"
 
 function load.readFile(path)
-    local contents = love.filesystem.read(path..".chp")
+    local err,body=https.request("https://raw.githubusercontent.com/ShrimpCatDev/cherrypop-db/refs/heads/main/carts/"..path..".chp")
+    local contents = body
     local codeLoc=string.find(contents,keyWordCode)
     local spriteLoc=string.find(contents,keyWordSprite)
     local mapLoc=string.find(contents,keyWordMap)
@@ -68,44 +84,6 @@ function load.readFile(path)
     end
 end
 
-local templateCart=[[
-#CART
-
-#SPRITE
-
-#MAP
-]]
-
-function load.readCode(path)
-    local contents = love.filesystem.read(path..".chp")
-    sections = {}
-    local current = ""
-    local currentSection = ""
-    
-    -- Parse file into sections
-    for line in contents:gmatch("[^\r\n]+") do
-        if line:match("^#%w*") then
-            -- Found section marker
-            if currentSection ~= "" then
-                sections[currentSection] = current
-                current = ""
-            end
-            currentSection = line:match("^#(%w*)")
-        else
-            current = current .. line .. "\n"
-        end
-    end
-    -- Add final section
-    if currentSection ~= "" then
-        sections[currentSection] = current
-    end
-    
-    -- Load code section
-    return sections.CODE or ""
-    
-    -- Add similar loading for MAP and SFX sections
-end
-
 
 local makingFile=false
 local fileName=""
@@ -114,7 +92,7 @@ local message=""
 local function refreshFiles()
     items=getFileList()
     --love.filesystem.write("DONTREADME.txt", "this is a temporary file just ignore this")
-    table.insert(items,"new cart...")
+    --table.insert(items,"new cart...")
 end
 
 function menu:enter()
@@ -158,9 +136,9 @@ function menu:update()
             if ind<1 then ind=#items end
         end
         if input2:pressed("a") then
-            if ind==#items then
-                makingFile=true
-            else
+            --if ind==#items then
+                --makingFile=true
+            --else
                 loadSheet={}
                 mapSheet={}
                 load.readFile(items[ind])
@@ -172,7 +150,7 @@ function menu:update()
                 editor.map.boot=true
 
                 gs.switch(runCart)
-            end
+            --end
         end
     end
 end
@@ -187,10 +165,10 @@ function menu:draw()
         end
     end]]
     if not makingFile then
-        colr(2)
+        colr(1)
         lg.rectangle("fill",0,0,128,96)
         colr(13)
-        drawFont("select a cart",1,1)
+        drawFont("S cartverse S",1,1)
         for k=1,#items do
             if k==ind then
                 colr(13)
@@ -217,51 +195,19 @@ function menu:draw()
     shove.endDraw()
 end
 
-function menu:textinput(k)
-    if makingFile and string.len(fileName)<25 then
-        fileName=fileName..k
-    end
-end
-
 name=""
 
+local templateCart=[[
+#CART
 
+#SPRITE
+
+#MAP
+]]
 
 function menu:keypressed(key)
-    if not makingFile then
-        if key=="escape" and cartLoaded then
-            gs.switch(editor.code)
-        end
-        if key=="f" then
-            love.system.setClipboardText(love.filesystem.getSaveDirectory( ))
-            local suc= love.system.openURL("file://"..love.filesystem.getSaveDirectory())
-            if suc then
-                message="opened data directory!"
-            else
-                message="didn't open data directory"
-            end
-        end
-    else
-        if key=="backspace" and string.len(fileName)>0 then
-            fileName=string.sub(fileName,1,string.len(fileName)-1)
-        end
-        if key=="return" then
-            if not love.filesystem.getInfo(fileName..".chp") then
-                love.filesystem.write(fileName..".chp", templateCart)
-                makingFile=false
-                fileName=""
-                refreshFiles()
-                message=""
-            else
-                message="file already exists"
-            end
-        end
-        if key=="escape" then
-            makingFile=false
-            fileName=""
-            message=""
-            refreshFiles()
-        end
+    if key=="escape" and cartLoaded then
+        gs.switch(editor.code)
     end
 end
 

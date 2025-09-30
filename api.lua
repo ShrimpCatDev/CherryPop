@@ -173,7 +173,7 @@ function api.cls(c)
             api.pset(x+camera.x,y+camera.y,cc)
         end
     end
-    print("screen cleared")
+    --print("screen cleared")
 end
 
 local function Color(hex, value)

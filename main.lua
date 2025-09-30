@@ -66,6 +66,7 @@ function love.load(arg)
     gs.registerEvents()
     runCart=require("runcart")
     menuProg=require("menu")
+    surfProg=require("surf")
 
     editor={}
     editor.sprite=require("editors.sprite")
