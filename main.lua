@@ -30,6 +30,53 @@ function love.textinput(txt)
     --gs.textinput(txt)
 end
 
+keyWordSprite="#SPRITE"
+keyWordCode="#CODE"
+keyWordMap="#MAP"
+
+function readFile(contents)
+    local codeLoc=string.find(contents,keyWordCode)
+    local spriteLoc=string.find(contents,keyWordSprite)
+    local mapLoc=string.find(contents,keyWordMap)
+    --love.filesystem.write("output.txt", tostring(mapLoc))
+
+
+    if codeLoc then 
+        cart=string.sub(contents,codeLoc+string.len(keyWordCode)+1,spriteLoc-1)
+    else
+        cart=""
+    end
+
+    local sprString=string.sub(contents,spriteLoc+string.len(keyWordSprite)+1,(mapLoc or (string.len(contents)+1))-1)
+    --print(sprString)
+    if spriteLoc and string.len(sprString)>16383 then
+        for i=1,string.len(sprString) do
+            local char="0x"..string.sub(sprString,i,i)
+            local charNum=tonumber(char)
+            table.insert(loadSheet,charNum)
+        end
+    else
+        for i=1,16384 do
+            table.insert(loadSheet,0)
+        end
+    end
+
+    if mapLoc then 
+        local mapString=string.sub(contents,mapLoc+string.len(keyWordMap)+1,string.len(contents))
+        if string.len(mapString)>((128*96)*2)-1 then
+            for i=1,string.len(mapString)/2 do
+                local char="0x"..string.sub(mapString,((i-1)*2)+1,((i-1)*2)+2)
+                local charNum=tonumber(char)
+                table.insert(mapSheet,charNum)
+            end
+        else
+            for i=1,(128*96)*2 do
+                table.insert(mapSheet,0)
+            end
+        end
+    end
+end
+
 
 function love.load(arg)
     love.keyboard.setTextInput(true)
@@ -66,7 +113,7 @@ function love.load(arg)
     gs.registerEvents()
     runCart=require("runcart")
     menuProg=require("menu")
-    --surfProg=require("surf")
+    surfProg=require("surf")
 
     editor={}
     editor.sprite=require("editors.sprite")

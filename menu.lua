@@ -1,4 +1,4 @@
-menu={}
+local menu={}
 local items={}
 local ind=1
 load={}
@@ -15,90 +15,7 @@ local function getFileList()
     return names
 end
 
---[[function load.readFile(path)
-    contents, size=love.filesystem.read(path..".chp")
-    cart=contents
-end]]
-
-keyWordSprite="#SPRITE"
-keyWordCode="#CODE"
-keyWordMap="#MAP"
-
-function readFile(contents)
-    local codeLoc=string.find(contents,keyWordCode)
-    local spriteLoc=string.find(contents,keyWordSprite)
-    local mapLoc=string.find(contents,keyWordMap)
-    --love.filesystem.write("output.txt", tostring(mapLoc))
-
-
-    if codeLoc then 
-        cart=string.sub(contents,codeLoc+string.len(keyWordCode)+1,spriteLoc-1)
-    else
-        cart=""
-    end
-
-    local sprString=string.sub(contents,spriteLoc+string.len(keyWordSprite)+1,(mapLoc or (string.len(contents)+1))-1)
-    --print(sprString)
-    if spriteLoc and string.len(sprString)>16383 then
-        for i=1,string.len(sprString) do
-            local char="0x"..string.sub(sprString,i,i)
-            local charNum=tonumber(char)
-            table.insert(loadSheet,charNum)
-        end
-    else
-        for i=1,16384 do
-            table.insert(loadSheet,0)
-        end
-    end
-
-    if mapLoc then 
-        local mapString=string.sub(contents,mapLoc+string.len(keyWordMap)+1,string.len(contents))
-        if string.len(mapString)>((128*96)*2)-1 then
-            for i=1,string.len(mapString)/2 do
-                local char="0x"..string.sub(mapString,((i-1)*2)+1,((i-1)*2)+2)
-                local charNum=tonumber(char)
-                table.insert(mapSheet,charNum)
-            end
-        else
-            for i=1,(128*96)*2 do
-                table.insert(mapSheet,0)
-            end
-        end
-    end
-end
-
-local templateCart=keyWordCode.."\n\n\n"..keyWordSprite.."\n\n\n"..keyWordMap.."\n\n\n"
-
-function load.readCode(path)
-    local contents = love.filesystem.read(path..".chp")
-    sections = {}
-    local current = ""
-    local currentSection = ""
-    
-    -- Parse file into sections
-    for line in contents:gmatch("[^\r\n]+") do
-        if line:match("^#%w*") then
-            -- Found section marker
-            if currentSection ~= "" then
-                sections[currentSection] = current
-                current = ""
-            end
-            currentSection = line:match("^#(%w*)")
-        else
-            current = current .. line .. "\n"
-        end
-    end
-    -- Add final section
-    if currentSection ~= "" then
-        sections[currentSection] = current
-    end
-    
-    -- Load code section
-    return sections.CODE or ""
-    
-    -- Add similar loading for MAP and SFX sections
-end
-
+local templateCart=keyWordCode.."\n\n"..keyWordSprite.."\n\n"..keyWordMap.."\n\n"
 
 local makingFile=false
 local fileName=""
@@ -108,7 +25,10 @@ local function refreshFiles()
     items=getFileList()
     --love.filesystem.write("DONTREADME.txt", "this is a temporary file just ignore this")
     table.insert(items,"new cart...")
+    table.insert(items,"B surf online")
 end
+
+local input2={}
 
 function menu:enter()
 
@@ -136,6 +56,7 @@ function menu:enter()
           joystick = love.joystick.getJoysticks()[1],
 
     }
+    input2:update()
 end
 
 function menu:update()
@@ -151,8 +72,10 @@ function menu:update()
             if ind<1 then ind=#items end
         end
         if input2:pressed("a") then
-            if ind==#items then
+            if ind==#items-1 then
                 makingFile=true
+            elseif ind==#items then
+                gs.switch(surfProg)
             else
                 loadSheet={}
                 mapSheet={}
