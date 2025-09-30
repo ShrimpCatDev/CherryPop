@@ -35,6 +35,7 @@ keyWordCode="#CODE"
 keyWordMap="#MAP"
 
 function love.conf(t)
+    t.renderers = {"opengl"}
     t.window.highdpi=false
 end
 
