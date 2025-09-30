@@ -143,16 +143,14 @@ function map:enter()
     bar.init()
     activated=false
     
+    zoomOpen=false
     selOpen=false
     selCanvas=love.graphics.newCanvas(128,96-16)
+    zoomCanvas=love.graphics.newCanvas(128,96-16)
     mode="draw"
     buttons.new(0,96-8,8,8,"0000000001111110010101100110101001010110011010100111111000000000",3,13,function()
-        if selOpen then
-            selOpen=false
-        else
-            selOpen=true
-        end
-        
+        selOpen=true
+        zoomOpen=false
     end)
     --draw mode button
     buttons.new(8,96-8,8,8,"0000000000000100000011100001110000111000011100000110000000000000",3,13,function()
@@ -167,7 +165,8 @@ function map:enter()
     end)
     --zoom button
     buttons.new(32,96-8,8,8,"0000000001111000010010000100100001111100000011100000011000000000",3,13,function()
-        mode="zoom"
+        zoomOpen=true
+        selOpen=false
     end)
     if self.boot then
         sel.x,sel.y=0,0
@@ -182,9 +181,13 @@ function map:enter()
     self.rect={}
 end
 
+local function col(ax,ay,bx,by,aw,ah,bw,bh)
+    return ax<bx+bw and bx<ax and ay<by+bh and by<ay
+end
+
 function map:update()
     mouse.update()
-    if not selOpen then
+    if not selOpen and not zoomOpen then
         if love.keyboard.isDown("left") then
             cam.x=cam.x+2
         end
@@ -214,14 +217,20 @@ function map:update()
                 selectedTile=(api.mget(mx-cx,my-cy))
             end
         end
-    else
+    elseif selOpen then
         local mx,my=math.floor(mouse.x/8),math.floor(mouse.y/8)+sheetOs
         if love.mouse.isDown(1) and mouse.y>=8 and mouse.y<96-8 then
             sel.x,sel.y=mx,my-1
         end
         selectedTile=sel.x+(sel.y*16)
+    else
+        if mouse.y>=8 and mouse.y<96-8 and col(map.zoom.osx,map.zoom.osy,mouse.x,mouse.y,64,96/2,1,1) then
+            cam.x,cam.y=mouse.x-map.zoom.osx,mouse.y-map.zoom.osy
+        end
     end
 end
+
+map.zoom={osx=64-32,osy=96/2-(96/4)-8,div=2}
 
 function map:draw()
     lg.setColor(1,1,1)
@@ -234,6 +243,21 @@ function map:draw()
             colr(13)
             lg.rectangle("line",(sel.x*8)+1,((sel.y-sheetOs)*8)+1,7,7)
 
+    lg.setCanvas()
+
+    lg.setCanvas(zoomCanvas)
+        colr(1)
+        divX=128/16
+        divY=96/12
+        for x=0,divX-1 do
+            for y=0,divY-1 do
+                lg.rectangle("line",x*(64/divX)+map.zoom.osx+0.5,y*(96/2/divY)+map.zoom.osy+0.5,64/divX,96/2/divY)
+            end
+        end
+        colr(13)
+        if col(map.zoom.osx,map.zoom.osy,mouse.x,mouse.y,64,96/2,1,1) then
+            lg.rectangle("line",mouse.x+0.5,mouse.y+0.5,64/divX,96/2/divY)
+        end
     lg.setCanvas()
     
     shove.beginDraw()
@@ -271,7 +295,9 @@ function map:draw()
             
             lg.setColor(1,1,1)
             lg.draw(selCanvas,0,8)
-            
+        elseif zoomOpen then
+            lg.setColor(1,1,1)
+            lg.draw(zoomCanvas,0,8)
         end
         lg.pop()
         bar.draw()
@@ -394,6 +420,11 @@ function map:mousereleased(x,y,b)
     if b==1 and selOpen then
         if mouse.y>=8 and mouse.y<96-8 then
             selOpen=false
+        end
+    end
+    if b==1 and zoomOpen then
+        if mouse.y>=8 and mouse.y<96-8 then
+            zoomOpen=false
         end
     end
     
