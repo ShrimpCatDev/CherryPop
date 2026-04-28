@@ -3,7 +3,7 @@ local items={}
 local ind=1
 load={}
 
-https=require("https")
+https=require("runtime/loader").loadHTTPS()
 
 local function getWebList()
     local names = {}

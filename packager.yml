@@ -1,0 +1,15 @@
+name: CherryPop
+
+description: A game created with LÖVE
+version: 0.0.1
+icon: assets/icon.png
+
+assets:
+  - "*.lua"
+  - assets/**/*
+  - editors/**/*
+  - lib/**/*
+
+targets:
+  - love
+  - web
