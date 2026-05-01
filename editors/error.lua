@@ -24,7 +24,8 @@ function error:draw()
     --[[lg.print(msg,0,0)
     lg.print("press esc to return to editor",0,12)
     lg.print("ERROR HANDLING IS A WIP, SO IT MAY NOT WORK CORRECTLY",0,24)]]
-    push:start()
+    shove.beginDraw()
+    shove.beginLayer("screen")
     love.graphics.setColor(palCol(2))
     lg.rectangle("fill",0,0,128,96)
     colr(13)
@@ -33,7 +34,8 @@ function error:draw()
     end
     colr(3)
     drawFont(msgs[msgIndex],1,96-7)
-    push:finish()
+    shove.endLayer()
+    shove.endDraw()
 end
 
 function error:keypressed(k)

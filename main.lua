@@ -1,4 +1,6 @@
 tick=require 'lib.tick'
+bit=require("bit")
+love.filesystem.setIdentity("CherryPop")
 
 love.graphics.setDefaultFilter("nearest","nearest")
 
@@ -91,7 +93,7 @@ function love.load(arg)
     camera={x=0,y=0}
     boot=false
 
-    initFont("assets/font.png",[===[abcdefghijklmnopqrstuvwxyz !CF0123456789.:(){}-+/*,="'_[]RBSH?<>@#$%^&A]===],5,6)
+    initFont("assets/font.png",[===[abcdefghijklmnopqrstuvwxyz !CF0123456789.:(){}-+/*,="'_[]RBSH?<>@#$%^&A~]===],5,6)
     spriteUndo={}
 
     love.window.setTitle("CherryPop")
@@ -163,9 +165,9 @@ end
 
 fullscreen=false
 function love.keypressed(k)
-    --[[if k=="f11" then
-        push:switchFullscreen()
-    end]]
+    if k=="f11" then
+        love.window.setFullscreen(not love.window.getFullscreen())
+    end
 end
 
 function love.resize(w, h)
