@@ -23,6 +23,26 @@ function palCol(b)
     return mem.pal[n+1][1]/255,mem.pal[n+1][2]/255,mem.pal[n+1][3]/255
 end
 
+function hexImg(hexString, x, y, w, h,tc)
+    local index = 1
+    for row = 0, h - 1 do
+        for col = 0, w - 1 do
+            local hexChar = string.sub(hexString, index, index)
+            local colorIndex = tonumber(hexChar, 16)
+            if colorIndex and colorIndex~=tc then
+                love.graphics.setColor(palCol(colorIndex))
+                love.graphics.points(x + col, y + row)
+            end
+            index = index + 1
+        end
+    end
+    love.graphics.setColor(1, 1, 1)
+end
+
+function lerp(a,b,t)
+    return a+(b-a)*t
+end
+
 function generateTable(w, h)
     local tbl = {}
     for i = 1, h do

@@ -31,7 +31,7 @@ end
 local input2={}
 
 function menu:enter()
-
+    self.cartImg="10ffffffffffffffffffffffffffffffff010feeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeef0feeddddddddddddddddddddddddddddddeeffeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeefffeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe111111111111111111111111111111efffe11111111111111111111111111111111eff1111111111111111111111111111111111ff1111111111111111111111111111111111ff1111111111111111111111111111111111ff1111111111111111111111111111111111ff1111111111111111111111111111111111ff1111111111111111111111111111111111ff1111111111111111111111111111111111ff1111111111111111111111111111111111ff1111111111111111111111111111111111ff1111111111111111111111111111111111ff1111111111111111111111111111111111ff1111111111111111111111111111111111ff1111111111111111111111111111111111ff1111111111111111111111111111111111ff1111111111111111111111111111111111ff1111111111111111111111111111111111ff1111111111111111111111111111111111ff1111111111111111111111111111111111ff1111111111111111111111111111111111ff1111111111111111111111111111111111ff1111111111111111111111111111111111ff1111111111111111111111111111111111ff1111111111111111111111111111111111ff1111111111111111111111111111111111ff1111111111111111111111111111111111ff1111111111111111111111111111111111ff1111111111111111111111111111111111ff1111111111111111111111111111111111ff1111111111111111111111111111111111ff1111111111111111111111111111111111ff1111111111111111111111111111111111ffe11111111111111111111111111111111efffe111111111111111111111111111111efffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000000000000000000000000000fff0f07676767676767676767676767676760f01006d6d6d6d6d6d6d6d6d6d6d6d6d6d6d0011106d6d6d6d6d6d6d6d6d6d6d6d6d6d6d011"
     makingFile=false
     fileName=""
     --local isFile = love.filesystem.getInfo("textdemo.chp")
@@ -57,17 +57,20 @@ function menu:enter()
 
     }
     input2:update()
+    self.t=0
+    self.ox=0
 end
 
 function menu:update()
+    self.t=self.t+1
     --require("lovebird").update()
     input2:update()
     if not makingFile then
-        if input2:pressed("down") then
+        if input2:pressed("right") then
             ind=ind+1
             if ind>#items then ind=1 end
         end
-        if input2:pressed("up") then
+        if input2:pressed("left") then
             ind=ind-1
             if ind<1 then ind=#items end
         end
@@ -90,6 +93,7 @@ function menu:update()
                 gs.switch(runCart)
             end
         end
+        self.ox=lerp(self.ox,(ind-1)*(36+16),0.2)
     end
 end
 
@@ -103,20 +107,50 @@ function menu:draw()
         end
     end]]
     if not makingFile then
-        colr(2)
+        colr(3)
         lg.rectangle("fill",0,0,128,96)
+        colr(2)
+        for x=-2,(128/8) do
+            for y=-2,(96/8) do
+                if (x+y)%2==0 then
+                    local a=(self.t/6)%16
+                    lg.rectangle("fill",x*8+a,y*8+a,8,8)
+                end
+            end
+        end
+        colr(1)
+        lg.rectangle("fill",0,0,128,7)
+        lg.rectangle("fill",0,96-8,128,8)
         colr(13)
-        drawFont("select a cart",1,1)
+        drawFont("game select",1,1)
+
+        local sw,sh=128/2,96/2
         for k=1,#items do
+            local w,h=36,48
+            
+            local x,y=sw-w/2+((k-1)*(w+16))-math.floor(self.ox),sh-h/2-7
+            colr(13)
+            lg.rectangle("fill",x+1,y+7,34,35)
+            hexImg(self.cartImg,x,y,w,h,1)
+        end
+
+        local w=string.len(items[ind])*5/2
+
+        colr(0)
+        drawFont(items[ind],sw-w+1,73)
+        colr(13)
+        drawFont(items[ind],sw-w,72)
+        
+        --[[for k=1,#items do
             if k==ind then
                 colr(13)
                 drawFont("A"..items[k],1,(k*font.h)-font.h+9)
             else
-                colr(3)
+                colr(1)
                 drawFont(items[k],1,(k*font.h)-font.h+9)
             end
         --lg.print(items[k],8,k*12)
-        end
+        end]]
     else
         colr(2)
         lg.rectangle("fill",0,0,128,96)
