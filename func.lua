@@ -10,12 +10,17 @@ function loadPal(image)
     return temp
 end
 
-function palCol(n)
+--[[function palCol(n)
     if n>=0 and n<16 then
         return mem.peek(0x3001+(n*3)+0)/255,mem.peek(0x3001+(n*3)+1)/255,mem.peek(0x3001+(n*3)+2)/255
     else
         return mem.peek(0x3001+(0*3)+0)/255,mem.peek(0x3001+(0*3)+1)/255,mem.peek(0x3001+(0*3)+2)/255
     end
+end]]
+
+function palCol(b)
+    local n=bit.band(b+mem.ps,255)
+    return mem.pal[n+1][1]/255,mem.pal[n+1][2]/255,mem.pal[n+1][3]/255
 end
 
 function generateTable(w, h)

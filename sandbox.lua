@@ -9,6 +9,7 @@ sb.box={
     _tick=function() end,
 
     pal=api.palset,
+    pos=api.pos,
     color=api.color,
 
     --drawing

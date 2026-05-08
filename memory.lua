@@ -8,12 +8,22 @@ mem.loc={
 }
 
 function mem.resetPal()
+    mem.pal={}
+    mem.ps=0
+    for i=0,255 do
+        table.insert(mem.pal,{0,0,0})
+    end
     pal=loadPal("assets/palette1.png")
     defPal=pal
-    for i=0,15 do
+    --[[for i=0,15 do
         mem.poke(mem.loc.palStart+(i*3)+0,pal[i+1].r)
         mem.poke(mem.loc.palStart+(i*3)+1,pal[i+1].g)
         mem.poke(mem.loc.palStart+(i*3)+2,pal[i+1].b)
+    end]]
+    for i=1,16 do
+        mem.pal[i][1]=pal[i].r
+        mem.pal[i][2]=pal[i].g
+        mem.pal[i][3]=pal[i].b
     end
 end
 

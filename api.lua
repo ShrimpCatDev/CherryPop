@@ -88,7 +88,7 @@ function api.pset(xx,yy,c)
     local y=yy-camera.y
     if x>=0 and x<=127 and y>=0 and y<=95 then
         if c then
-            mem.poke(mem.loc.dispStart+mem.toDisp(x,y),c)
+            mem.poke(mem.loc.dispStart+mem.toDisp(x,y),c+mem.ps)
         end
     end
 end
@@ -186,14 +186,19 @@ function api.color(hex, value)
 	return {tonumber(string.sub(hex, 2, 3), 16), tonumber(string.sub(hex, 4, 5), 16), tonumber(string.sub(hex, 6, 7), 16), value or 1}
 end
 
-function api.palset(c,r,g,b)
-    mem.poke(mem.loc.palStart+(c%16*3)+0,r)
-    mem.poke(mem.loc.palStart+(c%16*3)+1,g)
-    mem.poke(mem.loc.palStart+(c%16*3)+2,b)
+function api.palset(a,r,g,b)
+    local c=bit.band(a,255)
+    mem.pal[c+1][1]=r
+    mem.pal[c+1][2]=g
+    mem.pal[c+1][3]=b
+end
+
+function api.pos(n)
+    mem.ps=n
 end
 
 function api.palget(c)
-    return mem.peek(mem.loc.palStart+(c*3)+0),mem.peek(mem.loc.palStart+(c*3)+1),mem.peek(mem.loc.palStart+(c*3)+2)
+    return mem.pal[bit.band(c,255)+1]
 end
 
 function api.printc(letter,x,y,color)

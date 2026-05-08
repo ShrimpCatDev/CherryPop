@@ -123,6 +123,7 @@ function runCart:keypressed(k)
         sb.initCart(cart)
     end
     if k=="escape" then
+        mem.resetPal()
         gs.switch(editor.code)
     end
 end
