@@ -10,3 +10,5 @@ It features a 128x96 screen, 64 KiB of RAM, Lua scripting, a 128x128 spritesheet
 * once you are running a cart, press esc to go to the editors, right now there is a code editor, sprite editor, and tilemap editor
 * if you want to learn more on how to code in CherryPop, check out the docs.
 
+LATEST BUILDS ON THE ITCH.IO PAGE
+https://shrimpcat-games.itch.io/cherrypop
