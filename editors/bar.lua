@@ -25,6 +25,12 @@ function bar.init()
         print("switching to music")
         gs.switch(editor.wip)
     end)
+    buttons.new(40,0,8,8,"0000000001111110010000100111111001000010010000100111110000000000",3,13,function()
+        gs.switch(editor.wip)
+    end)
+    buttons.new(48,0,8,8,"0000000000011000001010000111111001011010011111000011100000000000",3,13,function()
+        gs.switch(editor.wip)
+    end)
     buttons.new(120,0,8,8,"0000000001100000011110000111111001111110011110000110000000000000",3,13,function()
         print("running cart")
         runCartCode()
@@ -32,6 +38,7 @@ function bar.init()
     buttons.new(112,0,8,8,"0000000000111100011001100000011000001100000000000001100000000000",3,13,function()
         love.system.openURL("https://github.com/ShrimpCatDev/CherryPop/blob/main/docs/manual.md")
     end)
+
     bar.timer=0
 end
 
