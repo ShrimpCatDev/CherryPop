@@ -127,6 +127,7 @@ function love.load(arg)
     editor.code=require("editors.code")
     editor.map=require("editors.map")
     editor.wip=require("editors.wip")
+    editor.icon=require("editors.icon")
     editor.error=require("editors.error")
 
     love.mouse.setVisible(false)
