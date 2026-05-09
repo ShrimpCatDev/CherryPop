@@ -36,9 +36,9 @@ local function refreshFiles()
     items,icons=getFileList()
     --love.filesystem.write("DONTREADME.txt", "this is a temporary file just ignore this")
     table.insert(items,"new cart...")
-    table.insert(icons,noIcon)
+    table.insert(icons,"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbeeeeeeecbbbbbbbbbbbbbbbbbbbbbbbbbedddddddecbbbbbbbbbbbbbbbbbbbbbbbbedddddddeccbbbbbbbbbbbbbbbbbbbbbbbedddddddecccbbbbbbbbbbbbbbbbbbbbbbedddddddeccccbbbbbbbbbbbbbbbbbbbbbedddddddecccccbbbbbbbbbbbbbbbeeeeeedddddddeeeeeecbbbbbbbbbbbbbedddddddddddddddddddecbbbbbbbbbbbbedddddddddddddddddddeccbbbbbbbbbbbedddddddddddddddddddecccbbbbbbbbbbedddddddddddddddddddeccccbbbbbbbbbedddddddddddddddddddecccccbbbbbbbbedddddddddddddddddddeccccccbbbbbbbedddddddddddddddddddecccccccbbbbbbfeeeeeedddddddeeeeeefcccccccbbbbbbfeeeeeedddddddeeeeeefcccccccbbbbbbcfffffedddddddefffffccccccccbbbbbbbcccccedddddddecccccccccccccbbbbbbbbccccedddddddecccccccccccccbbbbbbbbbcccedddddddecccccccccccccbbbbbbbbbbccfeeeeeeefcccccccccccccbbbbbbbbbbbcfeeeeeeefcccccccccccccbbbbbbbbbbbbcfffffffccccccccccccccbbbbbbbbbbbbbcccccccccccccccccccccbbbbbbbbbbbbbbccccccccccccccccccccbbbbbbbbbbbbbbbcccccccccccccccccccbbbbbbbbbbbbbbbbccccccccccccccccccbbbbbbbbbbbbbbbbbcccccccccccccccccbbbbbbbbbbbbbbbbbbcccccccccccccccc")
     table.insert(items,"B surf online")
-    table.insert(icons,noIcon)
+    table.insert(icons,"000000000000000000000000000000000000000000000e0000000000e000000000e0000d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002222222200000000000000000000000022333333332200000000000000000e0002333333333333100000d000000000000025535533333333210000000000000000025555555355333332100000000000000025565555555533333221000000000000025565555555533335332210000000000002555555555553335553221000e00000002556555555553333555322210000000000255555555553333333532221000000000025335555555333333333222100000000002333555555333333333322210000000000233555555333333333332221000000000023355555533333333353222100000000002335555555333335355442210000000000233333555533333355544421000000e000023333355553333355444210000000000002333335553333355444421000000000000023333355333333444421000000000000000123333333333244221000000000000000001223333332224221000000e000000000000122222222242210000000000000000d00001122222222110000000000000000000000001111111100000000000000000000000000000000000000000000000000000000000000000000000000000000000e00000000000000000000e00000d00000000000000e000000000000000000000000000000000000000000000000000000000")
 end
 
 local input2={}
@@ -122,11 +122,12 @@ function menu:draw()
         colr(3)
         lg.rectangle("fill",0,0,128,96)
         colr(2)
-        for x=-2,(128/8) do
-            for y=-2,(96/8) do
+        local t=math.floor(self.ox*0.5)
+        for x=-2-t,(128/8)+t do
+            for y=-2-t,(96/8)+t do
                 if (x+y)%2==0 then
                     local a=(self.t/6)%16
-                    lg.rectangle("fill",x*8+a,y*8+a,8,8)
+                    lg.rectangle("fill",x*8+a-math.floor(self.ox*0.5),y*8+a,8,8)
                 end
             end
         end
@@ -142,9 +143,14 @@ function menu:draw()
             
             local x,y=sw-w/2+((k-1)*(w+16))-math.floor(self.ox),sh-h/2-7
             colr(13)
+
+            local o=4
+            if k==ind then
+               o=0 
+            end
             --lg.rectangle("fill",x+1,y+7,34,34)
-            hexImg(icons[k],x+1,y+7,34,34,-1)
-            hexImg(cartImg,x,y,w,h,1)
+            hexImg(icons[k],x+1,y+7+o,34,34,-1)
+            hexImg(cartImg,x,y+o,w,h,1)
         end
 
         local w=string.len(items[ind])*5/2
