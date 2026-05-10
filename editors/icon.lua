@@ -8,7 +8,20 @@ local function click(mouse,obj)
     return col(mouse.x,mouse.y,obj.x,obj.y,1,1,obj.w,obj.h)
 end
 
+local function genArray(w,h,def)
+    local t={}
+    for y=1,h do
+        t[y]={}
+        for x=1,w do
+            t[y][x]=def
+        end
+    end
+    return t
+end
+
 function icon:enter()
+    self.canvas=genArray(34,34,0)
+    self.canvas[1][1]=8
     mouse=require("editors.mouse")
     bar.init()
     colorSelect={
@@ -28,6 +41,33 @@ function icon:enter()
             colorSelect.sel=math.floor(mx/s.scale)
         end
     end
+
+    local sw,sh=64,96/2
+    local w,h=36,48
+    local x,y=sw-w/2,sh-h/2-7
+    iconEdit={
+        x=x+1,
+        y=y+7,
+        w=34,h=34,
+        brush={
+            scale=8
+        }
+    }
+    local pix=function(x,y,c)
+        self.canvas[math.min(x,34)][math.min(y,34)]=c
+    end
+    iconEdit.update=function(mouse)
+        local s=iconEdit
+        
+        if click(mouse,iconEdit) then
+            local mx,my=mouse.x-s.x,mouse.y-s.y
+            for x=0,s.brush.scale-1 do
+                for y=0,s.brush.scale-1 do
+                    pix(my+y,mx+x,colorSelect.sel)
+                end
+            end
+        end
+    end
 end
 
 function icon:update()
@@ -35,6 +75,7 @@ function icon:update()
     if mouse.x and mouse.y then
         if love.mouse.isDown(1) then
             colorSelect.update(mouse)
+            iconEdit.update(mouse)
         end
     end
 end
@@ -59,6 +100,13 @@ function icon:draw()
 
         colr(colorSelect.sel)
         lg.rectangle("fill",16,16,8,8)
+
+        for i,y in ipairs(self.canvas) do
+            for j,x in ipairs(y) do
+                colr(x)
+                lg.points(j-1+iconEdit.x,i-1+iconEdit.y)
+            end
+        end
 
         bar.draw()
         mouse.draw()
