@@ -48,9 +48,9 @@ function icon:enter()
     iconEdit={
         x=x+1,
         y=y+7,
-        w=34,h=34,
+        w=35,h=35,
         brush={
-            scale=8
+            scale=1
         }
     }
     local pix=function(x,y,c)
